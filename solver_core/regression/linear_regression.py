@@ -45,7 +45,7 @@ class LinearRegression:
 
         if self.regularization is None:
             w = np.dot(np.dot(np.linalg.inv(np.dot(X.T, X)), X.T), self.y_points)
-            func = f'y = {w[0]} + {w[1]} * x' if w[1] >= 0 else f'y = {w[0]} - {abs(w[1])} * x'
+            func = f'y = {w[0]:.3f} + {w[1]:.3f} * x' if w[1] >= 0 else f'y = {w[0]:.3f} - {abs(w[1]):.3f} * x'
             predict = np.dot(w, X.T)
             free_member = float('{:.3f}'.format(float(w[0])))
 
@@ -57,14 +57,14 @@ class LinearRegression:
                 predict = np.dot(w, X.T)
                 delta = predict - self.y_points
                 w = w - learning_rate * (X.T.dot(delta) + l1 * np.sign(w))
-            func = f'y = {w[0]} + {w[1]} * x' if w[1] >= 0 else f'y = {w[0]} - {abs(w[1])} * x'
+            func = f'y = {w[0]:.3f} + {w[1]:.3f} * x' if w[1] >= 0 else f'y = {w[0]:.3f} - {abs(w[1]):.3f} * x'
             predict = np.dot(w, X.T)
             free_member = float('{:.3f}'.format(float(w[0])))
 
         if self.regularization == 'l2':
             l2 = self.alpha * 100
             w = np.dot(np.linalg.inv(l2 * np.eye(2) + X.T.dot(X)), np.dot(X.T, self.y_points))
-            func = f'y = {w[0]} + {w[1]} * x' if w[1] >= 0 else f'y = {w[0]} - {abs(w[1])} * x'
+            func = f'y = {w[0]:.3f} + {w[1]:.3f} * x' if w[1] >= 0 else f'y = {w[0]:.3f} - {abs(w[1]):.3f} * x'
             predict = X.dot(w)
             free_member = float('{:.3f}'.format(float(w[0])))
 
@@ -75,7 +75,7 @@ class LinearRegression:
             model = sm.OLS(predict, X)
             results = model.fit()
             w = results.params
-            func = f'y = {w[0]} + {w[1]} * x' if w[1] >= 0 else f'y = {w[0]} - {abs(w[1])} * x'
+            func = f'y = {w[0]:.3f} + {w[1]:.3f} * x' if w[1] >= 0 else f'y = {w[0]:.3f} - {abs(w[1]):.3f} * x'
             free_member = float('{:.3f}'.format(float(w[0])))
         return [func, predict, free_member]
 
