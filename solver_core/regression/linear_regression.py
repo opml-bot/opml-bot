@@ -45,7 +45,7 @@ class LinearRegression:
 
         if self.regularization is None:
             w = np.dot(np.dot(np.linalg.inv(np.dot(X.T, X)), X.T), self.y_points)
-            func = 'y= ' + '{:.3f}'.format(w[1]) + '*x +' + '{:.3f}'.format(w[0])
+            func = f'y = {w[0]} + {w[1]} * x' if w[1] >= 0 else f'y = {w[0]} - {abs(w[1])} * x'
             predict = np.dot(w, X.T)
             free_member = float('{:.3f}'.format(float(w[0])))
 
