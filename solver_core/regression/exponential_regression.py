@@ -59,7 +59,7 @@ class ExpRegression:
         # Если случай одномерный, то надо решейпнуть
         if len(self.X.shape) == 1:
             self.X = self.X.reshape((-1, 1))
-        print(self.X.shape)
+
 
         if self.regularization is None:
             self.regularization = 'None'
@@ -89,7 +89,8 @@ class ExpRegression:
             MNK += reg(koef)
             return MNK
 
-        answer = minimize(to_optim, self.omega)
+        answer = minimize(to_optim, [0]*len(self.omega))
+
         self.omega = np.array(answer['x'])
         # подготовка ответа
         func = f'{self.omega[0]:.4f}*exp({self.omega[1]:.4f}*x1'
@@ -177,7 +178,7 @@ if __name__ == "__main__":
     # a = np.random.random()*100
     # b = np.random.random(n_features)*5
 
-    X = 100*np.random.random(n_samples * n_features).reshape((n_samples, n_features))
+    X = np.random.random(n_samples * n_features).reshape((n_samples, n_features))
     Y = (a * np.exp(X @ b.reshape((-1, 1)))).flatten() + noise * np.random.random(n_samples)
     X = X.flatten()
 
@@ -188,4 +189,3 @@ if __name__ == "__main__":
 
     y_pred = task.predict(2)
     print(y_pred)
-    print(task.r2())
