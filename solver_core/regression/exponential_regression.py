@@ -11,7 +11,7 @@ class ExpRegression:
     Parameters
     ----------
     X: np.ndarray
-        Массив регрессеров. Строго двумерный (даже если регрессор один.
+        Массив регрессеров. Может быть одномерным, если регрессор один.
 
     y: np.ndarray
         Массив значений целевой функции. Строго одномерный.
@@ -35,7 +35,10 @@ class ExpRegression:
         self.regularization = regularization
 
         # omega - искомые коэфициенты. Здесь задаются начальные значения
-        self.omega = np.zeros(X.shape[1] + 1)
+        if len(self.X.shape) == 1:
+            self.omega = np.zeros(2)
+        else:
+            self.omega = np.zeros(X.shape[1] + 1)
         self.omega[0] = 1
 
     def solve(self):
@@ -53,6 +56,10 @@ class ExpRegression:
         free_member: float
             Свободный член регресси.
         """
+        # Если случай одномерный, то надо решейпнуть
+        if len(self.X.shape) == 1:
+            self.X = self.X.reshape((-1, 1))
+        print(self.X.shape)
 
         if self.regularization is None:
             self.regularization = 'None'
@@ -101,8 +108,8 @@ class ExpRegression:
 
         Parameters
         ----------
-        x: np.ndarray
-            Значения x для предсказания. Должен быть двумерным (даже если скаляр).
+        x: np.ndarray or float
+            Значения x для предсказания. Может быть числом или np.array размерности 2 или 1.
 
         Returns
         -------
@@ -110,6 +117,10 @@ class ExpRegression:
             Предсказанное значение.
         """
 
+        if type(x) != np.ndarray:
+            x = np.array([x]).reshape((1, 1))
+        elif len(x.shape) == 1:
+            x = x.reshape((-1, 1))
         prediction = self.omega[0] * np.exp(x @ self.omega[1:].reshape(-1, 1))
         return prediction.flatten()
 
@@ -140,7 +151,7 @@ class ExpRegression:
 
     def l2(self, koef=None):
         """
-        Регуляризация L1.
+        Регуляризация L2.
 
         Returns
         -------
@@ -168,11 +179,12 @@ if __name__ == "__main__":
 
     X = np.random.random(n_samples * n_features).reshape((n_samples, n_features))
     Y = (a * np.exp(X @ b.reshape((-1, 1)))).flatten() + noise * np.random.random(n_samples)
+    X = X.flatten()
 
     task = ExpRegression(X, Y)
     s = task.solve()
+    print(s)
     y_pred = task.predict(X)
-    x_ = np.array([2])
-    print(x_)
-    y_pred = task.predict(x_.reshape(-1, 1))
+
+    y_pred = task.predict(2)
     print(y_pred)
