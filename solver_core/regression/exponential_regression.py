@@ -59,7 +59,7 @@ class ExpRegression:
         # Если случай одномерный, то надо решейпнуть
         if len(self.X.shape) == 1:
             self.X = self.X.reshape((-1, 1))
-        print(self.X.shape)
+
 
         if self.regularization is None:
             self.regularization = 'None'
@@ -90,7 +90,7 @@ class ExpRegression:
             return MNK
 
         answer = minimize(to_optim, [0]*len(self.omega))
-        print(answer, to_optim(self.omega))
+
         self.omega = np.array(answer['x'])
         # подготовка ответа
         func = f'{self.omega[0]:.4f}*exp({self.omega[1]:.4f}*x1'
