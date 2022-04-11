@@ -134,7 +134,7 @@ class ExpRegression:
             Значение от -inf до 1. Чем больше, тем точнее построенная регрессия.
         """
 
-        score = 1 - np.sum((self.y - self.predict(self.X)) ** 2) / np.sum((self.Y - self.Y.mean()) ** 2)
+        score = 1 - np.sum((self.y - self.predict(self.X)) ** 2) / np.sum((self.y - self.y.mean()) ** 2)
         return score
 
     def l1(self, koef=None):
@@ -177,7 +177,7 @@ if __name__ == "__main__":
     # a = np.random.random()*100
     # b = np.random.random(n_features)*5
 
-    X = np.random.random(n_samples * n_features).reshape((n_samples, n_features))
+    X = 100*np.random.random(n_samples * n_features).reshape((n_samples, n_features))
     Y = (a * np.exp(X @ b.reshape((-1, 1)))).flatten() + noise * np.random.random(n_samples)
     X = X.flatten()
 
@@ -188,3 +188,4 @@ if __name__ == "__main__":
 
     y_pred = task.predict(2)
     print(y_pred)
+    print(task.r2())
