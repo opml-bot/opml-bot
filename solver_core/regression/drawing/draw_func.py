@@ -20,13 +20,39 @@ def draw_2d(reg_object: object):
     -------
 
     """
-    fig = make_subplots()
-    xs = reg_object.X.flatten()
-    fig.add_trace(reg_object.X.flatten)
+    fig = make_subplots(subplot_titles=['График уравнения регрессии и точек.'])
+    # отрисовка точек
+    x_scatter = reg_object.X.flatten()
+    y_scatter = reg_object.y
+    fig.add_trace(go.Scatter(x=x_scatter, y=y_scatter, mode='markers', name='Исходные точки'))
+    fig.update_traces(marker=dict(size=10,
+                                  color='#ff5733',
+                                  line=dict(width=2,
+                                            color='DarkSlateGrey')),
+                      selector=dict(mode='markers'))
+    # отрисовка линии
+    razm = x_scatter.max() - x_scatter.min()
+    x_line = np.linspace(x_scatter.min() - razm*0.1, x_scatter.max() + razm*0.1, 1000)
+    y_line = reg_object.predict(x_line)
+    fig.add_trace(go.Scatter(x=x_line, y=y_line, mode='lines', line=dict(width=3, color='#b30fb2'), name='Линия регрессии'))
+    fig.show()
 
 if __name__ == "__main__":
-    X = (np.random.random(100)*100).reshape((-1, 1))
-    X = np.random.random(100)*100
-    y = 20 + X[:, 0]*2 + X[:, 0]*3
-    task = LinearRegression(X=X, y=y)
-    task.solve()
+    # generate random exp regression
+    n_samples = 100
+    n_features = 1
+    noise = 0
+    a = 100
+    b = np.array([0.2])
+    # b = np.array([0.2, 0.6, 0.1])
+    # a = np.random.random()*100
+    # b = np.random.random(n_features)*5
+
+    X = 50*np.random.random(n_samples * n_features).reshape((n_samples, n_features))
+    Y = (a * np.exp(X @ b.reshape((-1, 1)))).flatten() + noise * np.random.random(n_samples)
+
+    task = ExpRegression(X=X, y=Y)
+    s = task.solve()
+    print(s)
+    #print(task.r2())
+    draw_2d(task)

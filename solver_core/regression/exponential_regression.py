@@ -89,7 +89,8 @@ class ExpRegression:
             MNK += reg(koef)
             return MNK
 
-        answer = minimize(to_optim, self.omega)
+        answer = minimize(to_optim, [0]*len(self.omega))
+        print(answer, to_optim(self.omega))
         self.omega = np.array(answer['x'])
         # подготовка ответа
         func = f'{self.omega[0]:.4f}*exp({self.omega[1]:.4f}*x1'
@@ -134,7 +135,7 @@ class ExpRegression:
             Значение от -inf до 1. Чем больше, тем точнее построенная регрессия.
         """
 
-        score = 1 - np.sum((self.y - self.predict(self.X)) ** 2) / np.sum((self.Y - self.Y.mean()) ** 2)
+        score = 1 - np.sum((self.y - self.predict(self.X)) ** 2) / np.sum((self.y - self.y.mean()) ** 2)
         return score
 
     def l1(self, koef=None):
