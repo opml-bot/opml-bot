@@ -140,7 +140,7 @@ class ExpRegression:
 
     def l2(self, koef=None):
         """
-        Регуляризация L1.
+        Регуляризация L2.
 
         Returns
         -------
