@@ -120,21 +120,37 @@ def draw(regression: object):
 
 
 if __name__ == "__main__":
-    # generate random exp regression
-    n_samples = 100
-    n_features = 2
-    noise = 0
-    a = 100
-    b = np.array([0.02, 0.02])
-    # b = np.array([0.2, 0.6, 0.1])
-    # a = np.random.random()*100
-    # b = np.random.random(n_features)*5
+    type_ = 2
+    if type_ == 1:
+        # generate random exp regression
+        n_samples = 100
+        n_features = 1
+        noise = 0
+        a = 100
+        b = np.array([0.02])
+        # b = np.array([0.2, 0.6, 0.1])
+        # a = np.random.random()*100
+        # b = np.random.random(n_features)*5
 
-    X = 50*np.random.random(n_samples * n_features).reshape((n_samples, n_features))
-    Y = (a * np.exp(X @ b.reshape((-1, 1)))).flatten() + noise * np.random.random(n_samples)
+        X = 50*np.random.random(n_samples * n_features).reshape((n_samples, n_features))
+        Y = (a * np.exp(X @ b.reshape((-1, 1)))).flatten() + noise * np.random.random(n_samples)
 
-    task = ExpRegression(X=X, y=Y, regularization='L1')
-    s = task.solve()
-    print(s)
-    print(task.r2())
-    draw(task)
+        task = ExpRegression(X=X, y=Y, regularization='L1')
+        s = task.solve()
+        print(s[0])
+        print(task.r2())
+        draw(task)
+    if type_ == 2:
+        n_samples = 100
+        n_features = 2
+        noise = 0
+        a = 100
+        b = np.array([0.02, 0.02])
+
+        X = 50*np.random.random(n_samples * n_features).reshape((n_samples, n_features))
+        print(X.shape)
+        Y = a + X @ b.reshape((n_features, 1))
+        print(Y.shape)
+        task = LinearRegression(X=X, y=Y)
+        task = task.solve()
+        print(task)
