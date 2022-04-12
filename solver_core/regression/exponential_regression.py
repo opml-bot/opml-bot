@@ -2,7 +2,7 @@ import numpy as np
 
 from typing import Optional
 from scipy.optimize import minimize
-
+from .drawing.draw_func import draw
 
 class ExpRegression:
     """
@@ -28,11 +28,13 @@ class ExpRegression:
                  X: np.ndarray,
                  y: np.ndarray,
                  alpha: Optional[float] = 0.5,
-                 regularization: Optional[str] = None):
+                 regularization: Optional[str] = None,
+                 draw_flag: Optional[bool] = False):
         self.X = X
         self.y = y
         self.alpha = alpha
         self.regularization = regularization
+        self.draw_flag = draw_flag
 
         # omega - искомые коэфициенты. Здесь задаются начальные значения
         if len(self.X.shape) == 1:
@@ -100,6 +102,8 @@ class ExpRegression:
         func += ')'
         koefs = self.omega[1:]
         free_member = self.omega[0]
+        if self.draw_flag:
+            draw(self, 1)
         return func, koefs, free_member
 
     def predict(self, x):
