@@ -6,7 +6,7 @@ from plotly.subplots import make_subplots
 from typing import Callable, Optional
 
 from ..linear_regression import LinearRegression
-from ..regression.exponential_regression import ExpRegression
+from ..exponential_regression import ExpRegression
 from ..polynomial_regression import polynomial_regression
 
 
