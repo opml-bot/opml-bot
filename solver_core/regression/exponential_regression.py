@@ -2,7 +2,7 @@ import numpy as np
 
 from typing import Optional
 from scipy.optimize import minimize
-# from .drawing.draw_func import draw
+from .drawing.draw_func import draw
 
 class ExpRegression:
     """
@@ -103,8 +103,7 @@ class ExpRegression:
         koefs = self.omega[1:]
         free_member = self.omega[0]
         if self.draw_flag:
-            pass
-            #draw(self)
+            draw(self, 1)
         return func, koefs, free_member
 
     def predict(self, x):

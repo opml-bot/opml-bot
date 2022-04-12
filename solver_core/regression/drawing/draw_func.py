@@ -5,9 +5,9 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from typing import Callable, Optional
 
-from ..linear_regression import LinearRegression
-from ..exponential_regression import ExpRegression
-from ..polynomial_regression import polynomial_regression
+# from ..linear_regression import LinearRegression
+# from ..exponential_regression import ExpRegression
+# from ..polynomial_regression import polynomial_regression
 
 
 def draw_2d(reg_object: object):
@@ -105,12 +105,12 @@ def draw_3d(reg_object: object):
     fig.show()
 
 
-def draw(regression: object):
+def draw(regression: object, type_regression: int):
     """
     Функция обертка для отрисовки. Внутри себя выполняет необходимые действия для запуска одной из функций draw_3d или
     draw_2d.
     """
-    if type(regression) == ExpRegression:
+    if type_regression == 1: # 1 - экспоненциальная регрессия
         if regression.X.shape[1] == 1:
             draw_2d(regression)
         elif regression.X.shape[1] == 2:
@@ -119,7 +119,7 @@ def draw(regression: object):
             mes = 'К сожалению, не получится построить график, так как регрессия является бооее чем трехмерной'
             raise ValueError(mes)
 
-    if type(regression) == LinearRegression:
+    if type_regression == 2: # 2 - Линейная регрессия
         x = regression.X.copy()
         regression.X = regression.X[:, 1:]
         regression.y = regression.y_points.copy().flatten()
