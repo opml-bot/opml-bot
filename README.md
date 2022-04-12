@@ -2,9 +2,10 @@
 
 Бот, умеющий решать оптимизационные задачи в машинном обучении.
 
-Александр Фролов – Project Manager, Tech Lead   
+Александр Фролов – Project Manager, Tech Lead 
+Галина Тараненко – Analyst
 Алина Шаркова – Analyst   
 Мария Пластинина – Analyst    
-Виктор Барбарич – Programmer    
+Дмитрий Дручинин – Programmer    
 Виталий Тимофеев – Programmer   
 Надежда Гераськина – Tester   
