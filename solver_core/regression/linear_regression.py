@@ -8,7 +8,7 @@ Original file is located at
 """
 
 from typing import Optional
-from .drawing.draw_func import draw
+# from .drawing.draw_func import draw
 import numpy as np
 from sklearn import linear_model
 import statsmodels.api as sm
@@ -97,7 +97,8 @@ class LinearRegression:
         koefs = self.omega[1:]
         free_member = self.omega[0]
         if self.draw_flag:
-            draw(self)
+            pass
+            # draw(self)
         return func, koefs, free_member
 
     def predict(self, x):
