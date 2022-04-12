@@ -7,7 +7,7 @@ from typing import Callable, Optional
 
 # from solver_core.regression.linear_regression import LinearRegression
 # from solver_core.regression.exponential_regression import ExpRegression
-# from ..polynomial_regression import polynomial_regression
+# from solver_core.regression.polynomial_regression import polynomial_regression
 
 
 def draw_2d(reg_object: object):
@@ -111,7 +111,6 @@ def draw(regression: object, type_regression: int):
     draw_2d.
     """
     if type_regression == 1: # 1 - экспоненциальная регрессия
-        print('Exp')
         if regression.X.shape[1] == 1:
             draw_2d(regression)
         elif regression.X.shape[1] == 2:
@@ -121,7 +120,6 @@ def draw(regression: object, type_regression: int):
             raise ValueError(mes)
 
     if type_regression == 2: # 2 - Линейная регрессия
-        print('Line')
         x = regression.X.copy()
         regression.X = regression.X[:, 1:]
         regression.y = regression.y_points.copy().flatten()
@@ -135,16 +133,30 @@ def draw(regression: object, type_regression: int):
         regression.X = x
         del regression.y
 
+    if type_regression == 3: # 2 - Полиномиальная регрессия
+        x = regression.X.copy()
+        regression.X = regression.x_points
+        regression.y = regression.y_points.copy().flatten()
+        if regression.X.shape[1] == 1:
+            draw_2d(regression)
+        elif regression.X.shape[1] == 2:
+            draw_3d(regression)
+        else:
+            mes = 'К сожалению, не получится построить график, так как регрессия является бооее чем трехмерной'
+            raise ValueError(mes)
+        regression.X = x
+        del regression.y
+
 
 if __name__ == "__main__":
-    type_ = 1
+    type_ = 3
     if type_ == 1:
         # generate random exp regression
         n_samples = 100
-        n_features = 2
+        n_features = 1
         noise = 0
         a = 100
-        b = np.array([0.02, 0.02])
+        b = np.array([0.02])
         # b = np.array([0.2, 0.6, 0.1])
         # a = np.random.random()*100
         # b = np.random.random(n_features)*5
@@ -174,3 +186,21 @@ if __name__ == "__main__":
         draw(task, 2)
         print(task.r2())
 
+    if type_ == 3:
+        n_samples = 100
+        n_features = 1
+        noise = 0
+        a = 100
+        b = np.array([-0.02])
+
+        X = 50 * np.random.random(n_samples * n_features).reshape((n_samples, n_features))
+        X = np.round(X, 2)
+
+        Y = a + X @ b.reshape((n_features, 1))
+        Y = Y.flatten()
+
+        task = polynomial_regression(X=X, y=Y, degree=2)
+        s = task.solve()
+        print(s)
+        draw(task, 3)
+        print(task.r2())

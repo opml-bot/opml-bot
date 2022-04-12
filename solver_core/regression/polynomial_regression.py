@@ -11,6 +11,7 @@ from typing import Optional, Callable
 import numpy as np
 import statsmodels.api as sm
 from sklearn.preprocessing import PolynomialFeatures
+from .drawing.draw_func import draw
 
 class polynomial_regression:
     """
@@ -34,13 +35,15 @@ class polynomial_regression:
                  y: np.ndarray,
                  degree: Optional[int] = 2,
                  regularization: Optional[str] = None,
-                 alpha: Optional[int] = 10):
+                 alpha: Optional[int] = 10,
+                 draw_flag: Optional[bool] = False):
 
         self.x_points = X
         self.y_points = y
         self.degree = degree
         self.regularization = regularization
         self.alpha = alpha
+        self.draw_flag = draw_flag
 
         # omega - искомые коэфициенты. Здесь задаются начальные значения
         if len(self.x_points.shape) == 1:
@@ -98,6 +101,8 @@ class polynomial_regression:
 
         koefs = self.omega[1:]
         free_member = self.omega[0]
+        if self.draw_flag:
+            draw(self, 3)
         return func, koefs, free_member
 
     def predict(self, x):
