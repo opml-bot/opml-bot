@@ -6,7 +6,8 @@ from plotly.subplots import make_subplots
 from typing import Callable, Optional
 
 from solver_core.regression.linear_regression import LinearRegression
-from solver_core.regression.exponential_regression import  ExpRegression
+from solver_core.regression.exponential_regression import ExpRegression
+from solver_core.regression.polynomial_regression import polynomial_regression
 
 
 def draw_2d(reg_object: object):
@@ -118,6 +119,20 @@ def draw(regression: object):
             mes = 'К сожалению, не получится построить график, так как регрессия является бооее чем трехмерной'
             raise ValueError(mes)
 
+    if type(regression) == LinearRegression:
+        x = regression.X.copy()
+        regression.X = regression.X[:, 1:]
+        regression.y = regression.y_points.copy().flatten()
+        if regression.X.shape[1] == 1:
+            draw_2d(regression)
+        elif regression.X.shape[1] == 2:
+            draw_3d(regression)
+        else:
+            mes = 'К сожалению, не получится построить график, так как регрессия является бооее чем трехмерной'
+            raise ValueError(mes)
+        regression.X = x
+        del regression.y
+
 
 if __name__ == "__main__":
     type_ = 2
@@ -142,15 +157,17 @@ if __name__ == "__main__":
         draw(task)
     if type_ == 2:
         n_samples = 100
-        n_features = 2
+        n_features = 1
         noise = 0
         a = 100
-        b = np.array([0.02, 0.02])
+        b = np.array([0.02])
 
         X = 50*np.random.random(n_samples * n_features).reshape((n_samples, n_features))
-        print(X.shape)
         Y = a + X @ b.reshape((n_features, 1))
-        print(Y.shape)
+        Y = Y.flatten()
+
         task = LinearRegression(X=X, y=Y)
-        task = task.solve()
-        print(task)
+        s = task.solve()
+        draw(task)
+        print(task.r2())
+
