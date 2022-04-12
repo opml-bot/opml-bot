@@ -90,8 +90,14 @@ class LinearRegression:
             model = sm.OLS(pred, self.X)
             results = model.fit()
             self.omega = results.params
-
-        func = f'y = {self.omega[0]:.3f} + {self.omega[1]:.3f} * x' if self.omega[1] >= 0 else f'y = {self.omega[0]:.3f} - {abs(self.omega[1]):.3f} * x'
+            
+        # подготовка ответа
+        func = f'{self.omega[0]:.4f} + {self.omega[1]:.4f}*x1'
+        if len(self.omega > 2):
+            for i in range(1, len(self.omega) - 1):
+                func += f' {self.omega[i+1]:+.4f}*x{i+1}'
+        func += ')'
+        
         koefs = self.omega[1:]
         free_member = self.omega[0]
         return func, koefs, free_member
