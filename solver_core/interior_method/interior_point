@@ -12,7 +12,7 @@ from typing import Callable, Optional
 from math import isclose
 from autograd import grad, hessian
 
-from solver_core.inner_point.handlers.prepocessing import prepare_func, prepare_constraints, get_variables
+from solver_core.interior_method.handles.prepocessing import get_variables, restrict
 
 
 class InteriorPoint:
