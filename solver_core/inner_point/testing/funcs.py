@@ -1,5 +1,3 @@
-def paraboloid(x1, x2):
-    return f"x1 ** 2 + x2 ** 2"
 
 
 def ackley(x1, x2):
@@ -235,9 +233,6 @@ michalewicz_restr_eq = ['x1+x2=3.77', '2x1-3x2=-0.31']
 michalewicz_restr_ineq = ['x1+x2<=4', '2x1-3x2<1']
 michalewicz_restr_eq_ineq = ['x1+x2=3.77', '2x1-3x2<1']
 
-paraboloid_point_min = "0; 0"
-paraboloid_point_start = "-5.12; -5.12"
-
 ackley_point_min = "0; 0"
 ackley_point_start = "-2; 2"
 
@@ -272,7 +267,7 @@ schaffer_point_min = "0; 0"
 schaffer_point_start = "-2; 2"
 
 schwefel_point_min = "420.9687; 420.9687"
-schwefel_point_start = ""
+schwefel_point_start = "1; 840.9474"
 
 bocharevsky_point_min = "0; 0"
 bocharevsky_point_start = "-2; 2"
@@ -319,8 +314,7 @@ easom_point_start = "0; 6.28"
 michalewicz_point_min = "2.20; 1.57"
 michalewicz_point_start = "-0.33; 4"
 
-funcs_str = {'Paraboloid': [paraboloid, paraboloid_point_min, paraboloid_point_start],
-             'Ackley function': [ackley, ackley_point_min, ackley_point_start],
+funcs_str = {'Ackley function': [ackley,{'eq':, 'ineq':, 'eq&ineq':} ackley_point_min, ackley_point_start],
              'Bukin function №6': [bukin, bukin_point_min, bukin_point_start],
              'Cross-in-tray function': [cross_in_tray, cross_in_tray_point_min, cross_in_tray_point_start],
              'Drop-wave function': [drop_wave, drop_wave_point_min, drop_wave_point_start],
