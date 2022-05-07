@@ -2,149 +2,110 @@ import numpy as np
 import math
 
 from math import sqrt
+from math import isclose
 
 import sympy.integrals.rubi.utility_function
 from sympy import sympify, Symbol, simplify
 from sympy.utilities.lambdify import lambdastr
 from typing import Optional, Callable
+import autograd.numpy as npa
 
 
-def prepare_func(func: str, variables: list, method: Optional[str] = 'None') -> Callable:
+# preprocessing
+def prepare_all(function: str, restriction: str, method: str, started_point: Optional[str] = None) -> tuple:
     """
-    Преобразует функцию записанной в строковом виде в функицю питона, которая принимает на вход массив с координатами
-    точки.
+    Функция подготавливает входные данные. В случае некорректного формата или математически неправильных записей будет
+    вызвана ошибка.
 
     Parameters:
     ------------
-    func: str
-        Функция в аналитическом виде, записанная в строке.
+    function: str
+        Функция для оптимизации. Функция в аналитическом виде, записанная в виде строки.
 
-    variables: list
-        Список из элементов типа sympy.Symbol. Представляют собой все переменные для функции.
+    restriction: str
+        Строка ограничений, разделенными точкой с запятой. Ограничения записываются в том же виде,
+        что и функция: функция в аналитическом виде в строке.(ограничения вида (=, =>, <=).
+
+    started_point: str
+        Координаты стартовой точки. Должна быть внутренней!
 
     method: str
         Метод для решения задачи. В зависимости от него будут переписываться ограничения для задачи. Принимает одно из
-        значений среди ['None', 'primal_dual', ...].
+        значений среди ['None', 'primal_dual', ...]
+
+    Returns
+    -------
+    func: Callable
+        Функция, представленная в виде питоновской функции.
+    restr: list
+        Список питоновских функций, которые представляют собой функции ограничений.
+    point: np.ndarray
+        Массив с координатами точки.
+    """
+
+    func = sympify(function)
+    func = to_callable(func)
+    restriction = restriction.split(';')
+    restr = []
+    if method == 'Newton':
+        for i in restriction:
+            left, right = i.split('=')
+            left = left.strip()
+            right = right.strip()
+            left, right = sympify(left), sympify(right)
+            left -= right
+            left = to_callable(left)
+            restr.append(left)
+    if method == 'primal-dual':
+        for i in restriction:
+            if i.find('>=') != -1:
+                spliter = '>='
+            elif i.find('<=') != -1:
+                spliter = '<='
+            left, right = i.split(spliter)
+            left = left.strip()
+            right = right.strip()
+            left, right = sympify(left), sympify(right)
+            left -= right
+            left = to_callable(left)
+            restr.append(left)
+    coords = started_point.split(';')
+    point = []
+    for i in range(len(coords)):
+        point.append(float(coords[i].strip()))
+    point = np.array(point)
+    return func, restr, point
+
+
+def to_callable(expression: sympy.core) -> Callable:
+    """
+    Преобразует исходное выражение в функцию питона.
+
+    Parameters:
+    ------------
+    expression: sympy expression
+        Преобразует выражение sympy в питоновскую функцию от массива.
 
     Returns:
     -------
-    function
-        питоновская функция
+    func: Callable
+        Питоновская функция от массива.
     """
 
-    vars = [str(i) for i in variables[::-1]]
-    dict_for_channge = dict(zip(vars, [f'x[{int(i[1:]) - 1}]' for i in vars]))
-    dict_for_methods = {'primal-dual': rewrite_for_primaldual, 'None': lambda x: x}
-    func = sympify(func)
-    func = dict_for_methods[method](func)
-    vars_in_func = func.free_symbols
-    func = lambdastr(['x'], func)
-    for i in vars_in_func:
+    str_vars = [str(i) for i in expression.free_symbols]
+    str_vars = sorted(str_vars, key=lambda x: int(x[1:]), reverse=True)
+    dict_for_vars = {i: f'x[{int(i[1:]) - 1}]' for i in str_vars}
+    func = lambdastr(['x'], expression)
+    for i in str_vars:
         i = str(i)
-        func = func.replace(i, dict_for_channge[i])
+        func = func.replace(i, dict_for_vars[i])
+    print(func[9:])
     func = 'f=' + func
     d = {}
-    if method == 'primal-dual':
-        import autograd.numpy as npa
-        exec(func, {'math': npa}, d)
-    else:
-        exec(func, {'math': math, 'sqrt': sqrt}, d)
-    return d['f']
-
-
-def get_variables(function: str) -> list:
-    """
-    Функция достает из записанной в аналитическом виде функции переменные.
-    Замечание: так как по правилам ввода переменные должны иметь вид x1, x2, x3, ..., xn, то в случае если функция
-    зависит только от переменных x1, x5 переменные x2, x3, x4 будут созданы автоматически
-
-    Parameters
-    ----------
-    function: str
-        Функция в аналитическом виде
-
-    Returns
-    -------
-    variables: list
-        Список с переменными типа sympy.Symbol, отсортированные по возрастанию индекса.
-    """
-
-    function = sympify(function)
-    var = list(function.free_symbols)
-    var_str = [str(i) for i in var]
-    max_index = int(max(var_str, key=lambda x: x[1:])[1:])
-    for i in range(1, max_index):
-        if f'x{i}' not in var_str:
-            var_str.append(f'x{i}')
-    var_str.sort(key=lambda x: int(x[1:]))
-    variables = [Symbol(i) for i in var_str]
-    return variables
-
-
-def rewrite_for_primaldual(function: sympy.core.relational):
-    """
-    Переписывает ограничения для решения задачи методом прямо-двойственной задачи. Все ограничения должны быть
-    вида ***функция ограничения*** >= 0 (ограничения больше или равно).
-
-    Parameters
-    ----------
-    function: str
-         Функия ограниченияmethod
-
-    Returns
-    -------
-    rewrited: sympy expression
-        Переписання функция.
-    """
-    function = str(function)
-    if function.find('<=') == -1 and function.find('>=') == -1 or function.count('<=') > 1 or function.count('>=') > 1:
-        raise ValueError(f'Невозможно переписать ограничения {function} должным образом.')
-    elif function.find('<=') != -1:
-        left, right = function.split('<=')
-        left = -sympify(left)
-        right = -sympify(right)
-        left = left - right
-    elif function.find('>=') != -1:
-        left, right = function.split('>=')
-        left = sympify(left)
-        right = sympify(right)
-        left = left - right
-    print(left, '>=',  right - right)
-    rewrited = left
-    return rewrited
-
-
-def prepare_constraints(constrainst: list, variables: list, method: str) -> list:
-    """
-    Функция, которая подготавливает ограничения для дальнейшего решения задачи.
-
-    Parameters
-    ----------
-    constrainst: list
-        Список, содержащий функции ограничений (в виде строк).
-
-    variables: list
-        Список из элементов типа sympy.Symbol. Представляют собой все переменные для данной задачи.
-
-    method: str
-        Метод для решения задачи. В зависимости от него будут переписываться ограничения для задачи. Принимает одно из
-        значений среди ['None', 'primal_dual', ...].
-
-    Returns
-    -------
-    Ограничения в том виде, который нужен для того или иного метода.
-    """
-    if method == 'primal-dual':
-        ans = []
-        for i in constrainst:
-            ans.append(prepare_func(i, variables, 'primal-dual'))
-        return ans
+    exec(func, {'math': npa}, d)
+    func = d['f'] # готовая функция
+    return func
 
 
 if __name__ == '__main__':
-    f = 'x1**2 + x2**2'
-    consts = ['x1 >= 0', 'x1 - x2 <=100', 'x2<=0']
-    vars = get_variables(f)
-    a = prepare_func(f, vars)
-    c = prepare_constraints(consts, vars, 'primal-dual')
-    print(c)
+    prepare_all('x1**2 - x3', ['x2 - x4 = 3'], 'Newton', '0;0;0;0')

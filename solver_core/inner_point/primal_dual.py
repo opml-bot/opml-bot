@@ -1,10 +1,12 @@
 import numpy as np
 from typing import Callable, Optional
 from math import isclose
-# import autograd.numpy as npa
+import autograd.numpy as npa
 from autograd import grad, hessian
+from numpy.linalg import norm
 
-from solver_core.inner_point.handlers.prepocessing import prepare_func, prepare_constraints, get_variables
+from solver_core.inner_point.handlers.input_validation import check_expression, check_restr, check_point
+from solver_core.inner_point.handlers.prepocessing import prepare_all
 
 
 class PrimalDual:
@@ -13,156 +15,162 @@ class PrimalDual:
 
     Parameters
     ----------
+    function: Callable
+        Функция для минимизации.
 
+    restrictions: list
+        Список функций (в смысле питоновских функций), которые представляют собой ограничения типа '>='.
+
+    x0: np.ndarray
+        Плоский массив, содержащий начальную точку.
+
+    k: Optional[float] = 0.9
+        Коэфициент для уменьшения mu на каждом шаге. 0 < k < 1.
+
+    eps: Optional[float] = 1e-12
+        Точность. От этого параметра зависит, когда будет остановлен итерационные процесс поиска решения. При
+        слишком малых значениях, есть вероятность бесконечного цикла или nan в ответе.
     """
 
-    def __init__(self, function, restrictions, x0, k=0.8):
+    def __init__(self,
+                 function: Callable,
+                 restrictions: list,
+                 x0: np.ndarray,
+                 k: Optional[float] = 0.9,
+                 eps: Optional[float] = 1e-12):
         self.function = function
         self.restrictions = restrictions
         self.k = k
         self.x = x0
         self.lam = np.array([0.5 for i in range(len(restrictions))])
+        self.eps = eps
 
-        self.hes_L = hessian(self.function)
-        self.hes_g = [hessian(i) for i in self.restrictions]
-        self.grad_g = [grad(i) for i in self.restrictions]
-        self.grad_L = grad(self.function)
-        self.mu = sum([self.lam[i] * self.restrictions[i](self.x) for i in range(len(self.restrictions))])
-        print(self.mu)
-        self.k = 0.9
+        self.grad_g = [grad(i) for i in self.restrictions] # список из функций, которые вычисют градиент ограничений
+        self.grad_f = grad(self.function) # функция вычисялет градиент функции оптимизации
 
+        self.mu = 1
+        self.N_con = len(restrictions)
 
     def solve(self):
-        nabla_L = self.grad_L(self.x)
-        G = []
-        for i in range(len(self.restrictions)):
-            nabla_L -= self.lam[i] * self.grad_g[i](self.x)
-            G.append(self.restrictions[i](self.x))
-        G = np.diag(G)
-        iter = 0
-        while not isclose(max(sum([i**2 for i in nabla_L]), np.sqrt(np.sum([G.diagonal()[i]*self.lam[i]**2 for i in range(len(self.lam))]))), 0, abs_tol=1e-7):
-            print(max(sum([i**2 for i in nabla_L]), np.sqrt(np.sum([G.diagonal()[i]*self.lam[i]**2 for i in range(len(self.lam))]))))
-            hessian_of_lagrangian = self.hes_L(self.x)
-            G = []
-            nabla_L = self.grad_L(self.x)
-            for i in range(len(self.restrictions)):
-                hessian_of_lagrangian -= self.hes_g[i](self.x) * self.lam[i]
-                if i == 0:
-                    nabla_g = -(self.grad_g[i](self.x)).reshape((-1, 1))
-                else:
-                    nabla_g = np.hstack((nabla_g, (-self.grad_g[i](self.x)).reshape((-1, 1))))
-                G.append(self.restrictions[i](self.x))
-                nabla_L -= self.lam[i] * self.grad_g[i](self.x)
-            Lambda_g = np.diag(self.lam) @ (-nabla_g.T)
-            Lambda_G = -np.diag(self.lam) @ np.array(G).reshape((-1, 1))
-            G = np.diag(np.array(G))
-            matr = np.vstack((np.hstack((hessian_of_lagrangian, nabla_g)), np.hstack((Lambda_g, G))))
-            nabla_L = nabla_L.reshape((-1, 1))
-            Lambda_G = Lambda_G + self.mu
-            Lambda_G = -Lambda_G
-            right_vec = np.vstack((nabla_L, Lambda_G))
+        """
+        Метод решает задачу.
 
-            ans = np.linalg.solve(matr, right_vec).flatten()
-            x = -ans[:len(ans)//2]
-            lam = -ans[len(ans)//2:]
+        Returns
+        -------
+        x: np.ndarray
+            Массив с решениями прямой задачи.
+
+        lam: np.ndarray
+            Массив с решениями двойственной задачи.
+        """
+
+        A = np.vstack([self.grad_g[i](self.x) for i in range(self.N_con)])
+        C = np.diag([i(self.x) for i in self.restrictions])
+        w = hessian(self.minimize_func)
+        while not isclose(norm(C@self.lam), 0, abs_tol=self.eps):
+            A = np.vstack([self.grad_g[i](self.x) for i in range(self.N_con)])
+            W = w(self.x)
+            C = np.diag([i(self.x) for i in self.restrictions])
+            matr = np.vstack((np.hstack((W, -A.T)), np.hstack((np.diag(self.lam) @ A, C))))
+            top = (-self.minimize_func_grad() + A.T @ self.lam).reshape(-1, 1)
+            bot = (self.mu - C @ self.lam).reshape(-1, 1)
+            vec = np.vstack((top, bot))
+            new = np.linalg.solve(matr, vec)
+            new_x = new.flatten()[:-self.N_con]
+            new_lam = new.flatten()[-self.N_con:]
             # поиск длины шага
-            alpha_d = min([1] + [-self.k*self.lam[i]/delta for i, delta in enumerate(lam) if delta < 0])
-            alpha_p = 1
-            while min([i(self.x + alpha_p * np.abs(x)) for i in self.restrictions]) <= 0:
-                alpha_p = alpha_p/2
-
-            self.x = self.x + alpha_p * x
-            self.lam = self.lam + alpha_d*lam
-            self.mu = self.mu/10
-            print(f'mu: {self.mu: .5E} xk: ({self.x[0]:3.5f}, {self.x[1]:.5f}) alpha_d: {alpha_d:.4f} lambda_k: ({self.lam[0]:.5f}, {self.lam[1]:.5f})')
-            iter += 1
+            alpha = 1
+            # calc_con = lambda x: np.array([i(x) for i in con])
+            while (self.calc_constrains(self.x + alpha * new_x) < 0).any() or ((self.lam + alpha * new_lam) < 0).any():
+                alpha /= 2
+            self.x = self.x + alpha * new_x
+            self.lam = self.lam + alpha * new_lam
+            self.mu = 0.9 * self.mu
         return self.x, self.lam
 
+    def calc_constrains(self, x):
+        """
+        Метод подставляет x в функции ограничения.
 
+        Parameters
+        ----------
+        x: np.ndarray
+            Значения точки для подстановки в ограничения.
 
-def gradient(function: Callable,
-             x0: np.ndarray,
-             delta_x=10**-8) -> np.ndarray:
-    """
-    Численно вычисляет градиент. Параметр  delta_x отвечает за шаг изменения аргумента в проивзводной.
+        Returns
+        -------
+        ans: np.ndarray
+            Массив со значениями функций ограничений.
+        """
+        ans = np.array([self.restrictions[i](x) for i in range(self.N_con)])
+        return ans
 
-    Parameters
-    ----------
-    function: Callable
-        Функция от которой берут гралиент в смысле питоновской фунции.
+    def minimize_func(self, x):
+        """
+        Метод вычисляет значения функци вместе с барьерной функцией (Лагранжиан).
 
-    x0: np.ndarray
-        Точка, в которой вычисляют градиент
+        Returns
+        -------
+        r: float
+            Значения указанной в описании функции.
+        """
+        r = self.function(x)
+        for i in self.restrictions:
+            r -= self.mu*npa.log(i(x))
+        return r
 
-    delta_x: Optional[float] = 1e-8
-         Шаг для производной.
+    def minimize_func_grad(self):
+        """
+        Метод вычисляет значения градиента Лагранжиана.
 
-    Returns
-    -------
-    grad: np.ndarray
-        Значения градиента в точке x
-    """
-    grad = []
-    for i in range(len(x0)):
-        delta_x_vec_plus = x0.copy()
-        delta_x_vec_minus = x0.copy()
-        delta_x_vec_plus[i] += delta_x
-        delta_x_vec_minus[i] -= delta_x
-        grad_i = (function(delta_x_vec_plus) - function(delta_x_vec_minus)) / (2 * delta_x)
-        grad.append(grad_i)
-
-    grad = np.array(grad)
-    return grad
-
-
-def hessian1(function: Callable,
-             x0: np.ndarray,
-             delta_x=10**-8) -> np.ndarray:
-    """
-    Численно вычисляет градиент. Параметр  delta_x отвечает за шаг изменения аргумента в проивзводной.
-
-    Parameters
-    ----------
-    function: Callable
-        Функция от которой берут гралиент в смысле питоновской фунции.
-
-    x0: np.ndarray
-        Точка, в которой вычисляют градиент
-
-    delta_x: Optional[float] = 1e-8
-         Шаг для производной.
-
-    Returns
-    -------
-    grad: np.ndarray
-        Значения градиента в точке x
-    """
-
-    hes = [[0 for j in range(len(x0))] for i in range(len(x0))]
-    for i in range(len(x0)):
-        for j in range(min(i+1, len(x0))):
-            delta_two_xs = x0.copy()
-            delta_two_xs[i] += delta_x
-            delta_two_xs[j] += delta_x
-            delta_xi = x0.copy()
-            delta_xi[i] += delta_x
-            delta_xj = x0.copy()
-            delta_xj[j] += delta_x
-
-            hes[i][j] = (function(delta_two_xs) - function(delta_xi) - function(delta_xj) + function(x0)) / (delta_x**2)
-    hes = np.array(hes, dtype=np.float64)
-    hes = hes+hes.T - np.diag(hes.diagonal())
-    return hes
+        Returns
+        -------
+        g : float
+            Значения указанной в описании функции.
+        """
+        g = self.grad_f(self.x)
+        grads = [i(self.x) for i in self.grad_g]
+        for i in range(self.N_con):
+            g -= self.mu*grads[i]
+        return g
 
 
 if __name__ == "__main__":
-    f = '-x1 - x2 + x3 + x4'
-    subject_to = ['x1 >= x2**2 - 1', 'x2>=0']
-    vars = get_variables(f)
+    #  первый пример, точка (0, 1)
+    # f = 'x1 - 2*x2'
+    # subject_to = ['1 + x1 - x2**2 >= 0', 'x2>=0']
+    # start_point = np.array([0.5, 0.5])
+    # right_point = (0, 1)
+    # vars = get_variables(f)
+    # второй пример, точка (1.5, 1.5)
+    # f = '2*x1 + 2*x2'
+    # subject_to = ['x1 + x2 >= 3', 'x1>=0', 'x2>=0']
+    # right_point = (1.5, 1.5)
+    # start_point = np.array([0.5, 0.5])
+    # vars = get_variables(f)
+    # третий пример, точка (1.5, 1.5)
+    # f = '3*x1 + 5*x2'
+    # subject_to = ['x1 <= 3', '2*x2<=12', '3*x1+2*x2<=18', 'x1>=0', 'x2>=0']
+    # right_point = (2, 6)
+    # start_point = np.array([2, 6.])
+    # vars = get_variables(f)
+    # правильный пример (zakharov)
+    # def f(x):
+    #     return x[0] ** 2 + x[1] ** 2 + (0.5 * 1 * x[0] + 0.5 * 2 * x[1]) ** 2 + (0.5 * 1 * x[0] + 0.5 * 2 * x[1]) ** 4
 
-    f = prepare_func(f, vars)
-    con = prepare_constraints(subject_to, vars, 'primal-dual')
+    f = 'x1**2 + x2**2 + (0.5*1*x1 + 0.5*2*x2)**2 + (0.5*1*x1 + 0.5*2*x2)**4'
+    subject_to = 'x1+x2<=0;2*x1-3*x2<=1'
+    zakharov_point_min = [0, 0]
+    # zakharov_point_start = np.array([-5, 4.])
+    zakharov_point_start = '-5;4'
 
-    task = PrimalDual(f, con, np.array([0.5, 0.5]))
+    # input_validation
+    f = check_expression(f)
+    subject_to = check_restr(subject_to, method='primal-dual')
+    zakharov_point_start = check_point(zakharov_point_start, f, subject_to, 'primal-dual')
+    # preprocessing
+    f, subject_to, zakharov_point_start = prepare_all(f, subject_to, 'primal-dual', zakharov_point_start)
+    # solver
+    task = PrimalDual(f, subject_to, zakharov_point_start)
     ans = task.solve()
-    print(ans )
+    print(ans[0])
