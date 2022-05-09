@@ -76,8 +76,14 @@ def check_restr(restr_str: str, method: str, splitter: Optional[str] = ';') -> s
                     raise ValueError(f'Неправильно задано ограничение {g[i]}')
                 left, right = g[i].split('=')
                 left, right = sympify(check_expression(left)), sympify(check_expression(right))
-                left -= right
-                right -= right
+                if right.free_symbols:
+                    left -= right
+                    right -= right
+                    num = left.subs({i: 0 for i in left.free_symbols})
+                    if num != 0:
+                        left -= num
+                        right += num
+
 
             checked = str(left) + '=' + str(right)
             ans.append(checked)
@@ -174,10 +180,11 @@ def check_point(point_str: str, function: str, restrs: str, method: str, splitte
     if max_ind != len(coords):
         raise ValueError('Размерность точки не сходится с размерностями функций из задачи')
     d = {f'x{i+1}': float(coords[i]) for i in range(len(coords))}
-    for i in r:
-        print(i.subs(d), i)
-        if float(i.subs(d)) <= 0:
-            raise ValueError('Точка не внутренняя')
+    if method == 'primal-dual':
+        for i in r:
+            print(i.subs(d), i)
+            if float(i.subs(d)) <= 0:
+                raise ValueError('Точка не внутренняя')
     points = ';'.join(coords)
     return points
 

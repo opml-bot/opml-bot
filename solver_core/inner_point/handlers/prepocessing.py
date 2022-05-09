@@ -1,4 +1,5 @@
 import numpy as np
+import re
 import math
 
 from math import sqrt
@@ -17,7 +18,7 @@ def prepare_all(function: str, restriction: str, method: str, started_point: Opt
     Функция подготавливает входные данные. В случае некорректного формата или математически неправильных записей будет
     вызвана ошибка.
 
-    Parameters:
+    Parameters
     ------------
     function: str
         Функция для оптимизации. Функция в аналитическом виде, записанная в виде строки.
@@ -44,6 +45,7 @@ def prepare_all(function: str, restriction: str, method: str, started_point: Opt
     """
 
     func = sympify(function)
+    variables = func.free_symbols
     func = to_callable(func)
     restriction = restriction.split(';')
     restr = []
@@ -53,9 +55,11 @@ def prepare_all(function: str, restriction: str, method: str, started_point: Opt
             left = left.strip()
             right = right.strip()
             left, right = sympify(left), sympify(right)
-            left -= right
-            left = to_callable(left)
-            restr.append(left)
+            if right.free_symbols:
+                left -= right
+            variables = variables | left.free_symbols
+        A, b = make_matrix(restriction, variables)
+        restr = [A, b]
     if method == 'primal-dual':
         for i in restriction:
             if i.find('>=') != -1:
@@ -81,12 +85,12 @@ def to_callable(expression: sympy.core) -> Callable:
     """
     Преобразует исходное выражение в функцию питона.
 
-    Parameters:
+    Parameters
     ------------
     expression: sympy expression
         Преобразует выражение sympy в питоновскую функцию от массива.
 
-    Returns:
+    Returns
     -------
     func: Callable
         Питоновская функция от массива.
@@ -99,7 +103,7 @@ def to_callable(expression: sympy.core) -> Callable:
     for i in str_vars:
         i = str(i)
         func = func.replace(i, dict_for_vars[i])
-    print(func[9:])
+    # print(func[9:])
     func = 'f=' + func
     d = {}
     exec(func, {'math': npa}, d)
@@ -107,5 +111,44 @@ def to_callable(expression: sympy.core) -> Callable:
     return func
 
 
+def make_matrix(expressions: list, xs: set) -> tuple:
+    """
+    Функция преобразует линейные sympy выражения в матрицы.
+
+    Parameters
+    ----------
+    expressions: list
+        Список ограничений фунции (в виде списка строк).
+    xs: set
+        Множество переменных в задаче.
+
+    Returns
+    -------
+    A: np.ndarray
+        Матрица весов при x.
+    b: np.ndarray
+        Вектор весов справа.
+    """
+
+    A = []
+    b = []
+    for i in expressions:
+        l, r = i.split('=')
+        b.append(float(r))
+        exp = sympify(l)
+        d = dict(zip(xs, [0] * len(xs)))
+        coefs = [0]*len(xs)
+        for j in exp.free_symbols:
+            d[j] = 1
+            coefs[int(str(j)[1:]) - 1] = float(exp.subs(d))
+            d[j] = 0
+        A.append(coefs)
+    A = np.array(A)
+    b = np.array(b)
+    return A, b
+
+
+
 if __name__ == '__main__':
-    prepare_all('x1**2 - x3', ['x2 - x4 = 3'], 'Newton', '0;0;0;0')
+    f, restr, p = prepare_all('x1**2 - x3', 'x2 - x4 = 3', 'Newton', '0;0;0;0')
+    print(restr[0]([1, 3, 2, 0]))
