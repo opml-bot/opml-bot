@@ -313,7 +313,7 @@ michalewicz_point_min = "2.20; 1.57"
 michalewicz_point_start = "-0.33; 4"
 
 funcs_str = {
-    'Ackley function': [ackley, {'eq': ackley_restr_eq, 'ineq': ackley_restr_ineq, 'eq&ineq': ackley_restr_eq_ineq}
+    'Ackley function': [ackley, {'eq': ackley_restr_eq, 'ineq': ackley_restr_ineq, 'eq&ineq': ackley_restr_eq_ineq},
                         ackley_point_min, ackley_point_start],
     'Bukin function №6': [bukin, {'eq': bukin_restr_eq, 'ineq': bukin_restr_ineq, 'eq&ineq': bukin_restr_eq_ineq},
                           bukin_point_min, bukin_point_start],
