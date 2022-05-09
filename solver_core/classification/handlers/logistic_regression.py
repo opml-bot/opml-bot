@@ -73,26 +73,18 @@ class LogisticRegression:
         """
         self.X_train = np.concatenate((np.ones_like(X_train), X_train), axis=1)
         self.omega = np.linalg.inv(self.X_train.T @ self.X_train) @ self.X_train.T @ self.y_train
-        # print(self.omega)
         i = 0
         old_w = np.array([-(10 ** 3)] * len(self.omega))
         while np.sum((old_w - self.omega) ** 2) > self.delta_w and i < self.max_iter:
-            # print('norma',np.sum((old_w - self.omega) ** 2))
             z = self.X_train @ self.omega
-            # print('z=',z)
             p = 1 / (1 + np.exp(-z))
-            # print('p=',p)
             g = p * (1 - p)
-            # print('g=',g)
             u = z + (self.y_train - p) / g
-            # print('u=',u)
             G = np.zeros((len(g), len(g)), float)
             np.fill_diagonal(G, g)
-            # print('G=',G)
             E = np.zeros((g.shape[1], g.shape[1]), int)
             np.fill_diagonal(E, 1)
             old_w = self.omega
-            # print('X_train=',self.X_train.shape)
             if self.regularization:
                 self.omega = np.linalg.inv(
                     self.X_train.T @ G @ self.X_train + self.alpha * E) @ self.X_train.T @ G @ u
@@ -100,19 +92,10 @@ class LogisticRegression:
                 self.omega = np.linalg.inv(self.X_train.T @ G @ self.X_train) @ self.X_train.T @ G @ u
             i += 1
 
-        # print('omega = ',self.omega)
-        # print('X_test',self.X_test )
         z = self.omega[0] + self.X_test @ self.omega[1:]
-        # print('z_last',z)
         y_pred = 1 / (1 + np.exp(-z))
-        # print('y_pred',y_pred)
         mu = np.mean(y_pred.flatten())
-        print('mu = ', mu)
-        # print(y_pred)
         y_pred = np.array([1 if i[0] >= mu else 0 for i in y_pred]).reshape((-1, 1))
-        # print(y_pred)
-        # print('omega', self.omega)
-        # print('res', np.concatenate((self.X_test, y_pred), axis=1))
         return np.concatenate((self.X_test, y_pred), axis=1), self.omega
 
 
