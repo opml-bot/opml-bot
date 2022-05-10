@@ -71,7 +71,7 @@ class LogisticRegression:
             Коэфициенты регрессии w.
 
         """
-        self.X_train = np.concatenate((np.ones_like(X_train), X_train), axis=1)
+        self.X_train = np.concatenate((np.ones_like(X_train[:,0:1]), X_train), axis=1)
         self.omega = np.linalg.inv(self.X_train.T @ self.X_train) @ self.X_train.T @ self.y_train
         i = 0
         old_w = np.array([-(10 ** 3)] * len(self.omega))
@@ -100,8 +100,8 @@ class LogisticRegression:
 
 
 if __name__ == "__main__":
-    X = np.random.randint(21, size=(100, 1))
-    y = np.array([1 if i > 10 else 0 for i in X]).reshape((-1, 1))
+    X = np.random.randint(21, size=(100, 2))
+    y = np.array([1 if i[0] > 10 and i[1] > 10 else 0 for i in X]).reshape((-1, 1))
     X_train = X[:80, :]
     y_train = y[:80, :]
     X_test = X[80:, :]
