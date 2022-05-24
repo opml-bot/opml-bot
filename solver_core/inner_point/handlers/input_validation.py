@@ -72,18 +72,12 @@ def check_restr(restr_str: str, method: str, splitter: Optional[str] = ';') -> s
             if g[i].find('<=') != -1 or g[i].find('>=') != -1:
                 raise ValueError(f'Для метода {method} ограничения должны быть равенствами.')
             else:
-                if g[i].count('=') > 1:
+                if g[i].count('=') != 1:
                     raise ValueError(f'Неправильно задано ограничение {g[i]}')
                 left, right = g[i].split('=')
                 left, right = sympify(check_expression(left)), sympify(check_expression(right))
-                if right.free_symbols:
-                    left -= right
-                    right -= right
-                    num = left.subs({i: 0 for i in left.free_symbols})
-                    if num != 0:
-                        left -= num
-                        right += num
-
+                left = left - right
+                right = right - right
 
             checked = str(left) + '=' + str(right)
             ans.append(checked)
@@ -107,7 +101,32 @@ def check_restr(restr_str: str, method: str, splitter: Optional[str] = ';') -> s
             right -= right
             checked = str(left) + '>=' + str(right)
             ans.append(checked)
+        if method == 'log_barrier':
+            if g[i].find('<=') != -1 or g[i].find('>=') != -1:
+                if g[i].count('=') > 1:
+                    raise ValueError(f'Неправильно задано ограничение {g[i]}')
+                if g[i].find('>=') != -1:
+                    splitt = '>='
+                elif g[i].find('<=') != -1:
+                    splitt = '<='
+                left, right = g[i].split(splitt)
+                left, right = sympify(check_expression(left)), sympify(check_expression(right))
+                if splitt == '>=':
+                    left -= right
+                if splitt == '<=':
+                    left = -left
+                    right = -right
+                    left -= right
+                right -= right
+                checked = str(left) + '>=' + str(right)
+                ans.append(checked)
+            else:
+                raise ValueError(f'''Для метода {method} ограничения типа равенств пока
+                 не поддерживаются, можем добавить.''')
+                # if g[i].count('=') != 1:
+                #     raise ValueError(f'Неправильно задано ограничение {g[i]}')
 
+    print(ans)
     restrs = ";".join(ans)
     return restrs
 
@@ -173,6 +192,9 @@ def check_point(point_str: str, function: str, restrs: str, method: str, splitte
         r = [sympify(i.split('=')[0]) for i in restrs.split(';')]
     elif method == 'primal-dual':
         r = [sympify(i.split('>=')[0]) if i.find('>=') != -1 else sympify(i.split('<=')[0]) for i in restrs.split(';')]
+    elif method == 'log_barrier':
+        r = [sympify(i.split('>=')[0]) if i.find('>=') != -1 else sympify(i.split('<=')[0]) for i in restrs.split(';')]
+
     max_ind = 0
     for i in [f]+r:
         i = max([int(str(j)[1:]) for j in i.free_symbols])
@@ -180,7 +202,13 @@ def check_point(point_str: str, function: str, restrs: str, method: str, splitte
     if max_ind != len(coords):
         raise ValueError('Размерность точки не сходится с размерностями функций из задачи')
     d = {f'x{i+1}': float(coords[i]) for i in range(len(coords))}
+
     if method == 'primal-dual':
+        for i in r:
+            print(i.subs(d), i)
+            if float(i.subs(d)) <= 0:
+                raise ValueError('Точка не внутренняя')
+    if method == 'log_barrier':
         for i in r:
             print(i.subs(d), i)
             if float(i.subs(d)) <= 0:
@@ -191,8 +219,8 @@ def check_point(point_str: str, function: str, restrs: str, method: str, splitte
 
 if __name__ == '__main__':
     func = 'x1**2 - x3'
-    restr = 'x2 - x4 = 3'
-    meth = 'Newton'
+    restr = 'x2 - x4 >= 3'
+    meth = 'log_barrier'
     start = '0;4;0;0'
 
     # костяк проверок

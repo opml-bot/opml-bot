@@ -45,7 +45,6 @@ def prepare_all(function: str, restriction: str, method: str, started_point: Opt
     """
 
     func = sympify(function)
-    variables = func.free_symbols
     func = to_callable(func)
     restriction = restriction.split(';')
     restr = []
@@ -55,11 +54,9 @@ def prepare_all(function: str, restriction: str, method: str, started_point: Opt
             left = left.strip()
             right = right.strip()
             left, right = sympify(left), sympify(right)
-            if right.free_symbols:
-                left -= right
-            variables = variables | left.free_symbols
-        A, b = make_matrix(restriction, variables)
-        restr = [A, b]
+            left -= right
+            left = to_callable(left)
+            restr.append(left)
     if method == 'primal-dual':
         for i in restriction:
             if i.find('>=') != -1:
@@ -73,6 +70,20 @@ def prepare_all(function: str, restriction: str, method: str, started_point: Opt
             left -= right
             left = to_callable(left)
             restr.append(left)
+    if method == 'log_barrier':
+        for i in restriction:
+            if i.find('>=') != -1:
+                spliter = '>='
+            elif i.find('<=') != -1:
+                spliter = '<='
+            left, right = i.split(spliter)
+            left = left.strip()
+            right = right.strip()
+            left, right = sympify(left), sympify(right)
+            left -= right
+            left = to_callable(left)
+            restr.append(left)
+            print(i)
     coords = started_point.split(';')
     point = []
     for i in range(len(coords)):
