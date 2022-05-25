@@ -83,7 +83,6 @@ def prepare_all(function: str, restriction: str, method: str, started_point: Opt
             left -= right
             left = to_callable(left)
             restr.append(left)
-            print(i)
     coords = started_point.split(';')
     point = []
     for i in range(len(coords)):

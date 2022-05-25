@@ -126,7 +126,6 @@ def check_restr(restr_str: str, method: str, splitter: Optional[str] = ';') -> s
                 # if g[i].count('=') != 1:
                 #     raise ValueError(f'Неправильно задано ограничение {g[i]}')
 
-    print(ans)
     restrs = ";".join(ans)
     return restrs
 
@@ -205,12 +204,10 @@ def check_point(point_str: str, function: str, restrs: str, method: str, splitte
 
     if method == 'primal-dual':
         for i in r:
-            print(i.subs(d), i)
             if float(i.subs(d)) <= 0:
                 raise ValueError('Точка не внутренняя')
     if method == 'log_barrier':
         for i in r:
-            print(i.subs(d), i)
             if float(i.subs(d)) <= 0:
                 raise ValueError('Точка не внутренняя')
     points = ';'.join(coords)
