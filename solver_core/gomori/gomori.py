@@ -11,7 +11,7 @@ import numpy as np
 from sympy import *
 import math
 
-from import *
+from solver_core.gomori.utils import *
 
 def gomori(matrix, function, basis, analysis):
 
