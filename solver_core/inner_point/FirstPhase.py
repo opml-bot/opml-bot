@@ -101,6 +101,7 @@ if __name__ == '__main__':
     consts = [lambda x: (-2*x[0] - 4*x[1] + 25), lambda x: (-x[0] + 8), lambda x: (-2*x[1] + 10),
               lambda x: x[0], lambda x: x[1]] # ограничения на >=
     consts = [rewrite(i) for i in consts]
+    consts = [lambda x: x[0] + x[1], lambda x: 2*x[0] - 3*x[1] - 1]
 
     p = FirstPhase(2, consts)
     print(p.solve())
