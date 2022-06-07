@@ -28,9 +28,9 @@ class FirstPhase:
                  n: int,
                  restrictions: list,
                  eps: Optional[float] = 1e-12):
-        print(n)
+
         self.x = np.random.random(n) * np.random.randint(1, 1000)
-        print('initial x', self.x)
+
         self.restrictions = restrictions
         self.s = max([i(self.x) for i in self.restrictions]) + 1
         self.eps = eps
@@ -45,19 +45,18 @@ class FirstPhase:
         l_hess = hessian(self.lagrange)
         l_grad = grad(self.lagrange)
         step = np.linalg.inv(l_hess(self.x)) @ l_grad(self.x)
-        for i in self.restrictions:
-            print('i(x) = ', i(self.x))
+
         while self.s - 1 > 0:
             if np.isnan(self.x).any():
                 break
             self.x = self.x - step
-            print(self.s)
+
             try:
                 step = np.linalg.inv(l_hess(self.x)) @ l_grad(self.x)
             # -------------------------------------------------------
             except np.linalg.LinAlgError as e:
                 for i in self.restrictions:
-                    print(i(self.x), end=' ')
+
                     if i(self.x) > 0:
                         break
                 else:
@@ -65,9 +64,9 @@ class FirstPhase:
             # -------------------------------------------------------
             self.s = max([i(self.x) for i in self.restrictions]) + 1
             self.mu += 1
-            print('check', end=' ')
+
             for i in self.restrictions:
-                print(i(self.x), end=' ')
+
                 if i(self.x) > 0:
                     break
             else:
