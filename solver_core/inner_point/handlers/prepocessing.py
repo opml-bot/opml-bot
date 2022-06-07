@@ -113,7 +113,7 @@ def prepare_all(function: str, restriction: str, method: str, started_point: Opt
         for i in range(5):
             try:
                 point = FirstPhase(n_vars, rewrited_restrs).solve()
-            except np.linalg.LinAlgError:
+            except (np.linalg.LinAlgError, OverflowError):
                 print(f'{i+1} попытка найти начальную точку провалилась, попробуем запустить новую итерацию.')
             else:
                 break
