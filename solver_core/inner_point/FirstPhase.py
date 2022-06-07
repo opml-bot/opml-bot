@@ -45,7 +45,8 @@ class FirstPhase:
         l_hess = hessian(self.lagrange)
         l_grad = grad(self.lagrange)
         step = np.linalg.inv(l_hess(self.x)) @ l_grad(self.x)
-        print(self.s)
+        for i in self.restrictions:
+            print('i(x) = ', i(self.x))
         while self.s - 1 > 0:
             if np.isnan(self.x).any():
                 break
