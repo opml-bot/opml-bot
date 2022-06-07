@@ -52,7 +52,17 @@ class FirstPhase:
                 break
             self.x = self.x - step
             print(self.s)
-            step = np.linalg.inv(l_hess(self.x)) @ l_grad(self.x)
+            try:
+                step = np.linalg.inv(l_hess(self.x)) @ l_grad(self.x)
+            # -------------------------------------------------------
+            except np.linalg.LinAlgError as e:
+                for i in self.restrictions:
+                    print(i(self.x), end=' ')
+                    if i(self.x) > 0:
+                        break
+                else:
+                    return self.x
+            # -------------------------------------------------------
             self.s = max([i(self.x) for i in self.restrictions]) + 1
             self.mu += 1
             print('check', end=' ')
