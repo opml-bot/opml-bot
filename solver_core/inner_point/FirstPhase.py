@@ -1,4 +1,4 @@
-from copy import copy
+from copy import deepcopy
 
 import numpy as np
 from typing import Callable, Optional
@@ -28,7 +28,9 @@ class FirstPhase:
                  n: int,
                  restrictions: list,
                  eps: Optional[float] = 1e-12):
+        print(n)
         self.x = np.random.random(n) * np.random.randint(1, 1000)
+        print('initial x', self.x)
         self.restrictions = restrictions
         self.s = max([i(self.x) for i in self.restrictions]) + 1
         self.eps = eps
@@ -43,11 +45,12 @@ class FirstPhase:
         l_hess = hessian(self.lagrange)
         l_grad = grad(self.lagrange)
         step = np.linalg.inv(l_hess(self.x)) @ l_grad(self.x)
-
+        print(self.s)
         while self.s - 1 > 0:
             if np.isnan(self.x).any():
                 break
             self.x = self.x - step
+            print(self.s)
             step = np.linalg.inv(l_hess(self.x)) @ l_grad(self.x)
             self.s = max([i(self.x) for i in self.restrictions]) + 1
             self.mu += 1
@@ -66,6 +69,25 @@ class FirstPhase:
         return l
 
 
+def rewrite(restr: Callable) -> Callable:
+    """
+    Функция переделывает ограничения с >= на <=.
+
+    Parameters
+    ----------
+    restr: list
+        Список питоновских функций, которые являются ограничениями для задачи (вида g(x) >= 0).
+
+    Returns
+    -------
+    new: list
+        Список переписанных функций (вида g(x) <= 0).
+    """
+    r = deepcopy(restr)
+    new = lambda x: -r(x)
+    return new
+
+
 if __name__ == '__main__':
     subject_to = 'x1+x2<=0;2*x1-3*x2<=1'
     zakharov_point_min = [0, 0]
@@ -73,7 +95,9 @@ if __name__ == '__main__':
     zakharov_point_start = '-5;4'
 
     f = lambda x: x[0] + x[1]
-    consts = [lambda x: -(-2*x[0] - 4*x[1] + 25), lambda x: -(-x[0] + 8), lambda x: -(-2*x[1] + 10),
-              lambda x: -x[0], lambda x: -x[1]] # ограничения на <=
+    consts = [lambda x: (-2*x[0] - 4*x[1] + 25), lambda x: (-x[0] + 8), lambda x: (-2*x[1] + 10),
+              lambda x: x[0], lambda x: x[1]] # ограничения на >=
+    consts = [rewrite(i) for i in consts]
+
     p = FirstPhase(2, consts)
     print(p.solve())

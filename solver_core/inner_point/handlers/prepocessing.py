@@ -125,7 +125,17 @@ def prepare_all(function: str, restriction: str, method: str, started_point: Opt
 
 def rewrite(restr: Callable) -> Callable:
     """
-    Функция переделывает.
+    Функция переделывает ограничения с >= на <=.
+
+    Parameters
+    ----------
+    restr: list
+        Список питоновских функций, которые являются ограничениями для задачи (вида g(x) >= 0).
+
+    Returns
+    -------
+    new: list
+        Список переписанных функций (вида g(x) <= 0).
     """
     r = deepcopy(restr)
     new = lambda x: -r(x)
@@ -136,7 +146,7 @@ def to_callable(expression: sympy.core) -> Callable:
     Преобразует исходное выражение в функцию питона.
 
     Parameters
-    ------------
+    ----------
     expression: sympy expression
         Преобразует выражение sympy в питоновскую функцию от массива.
 
