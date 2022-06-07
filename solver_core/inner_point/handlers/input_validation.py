@@ -182,7 +182,10 @@ def check_point(point_str: str, function: str, restrs: str, method: str, splitte
     """
 
     if point_str == '' or point_str == 'None':
+        if method == 'Newton':
+            raise ValueError('Для метода Ньютона необходимо указать начальную точку.')
         return ''
+
     coords = point_str.split(splitter)
     for i in range(len(coords)):
         coords[i] = str(check_float(coords[i]))

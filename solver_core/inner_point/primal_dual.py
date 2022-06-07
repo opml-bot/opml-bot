@@ -6,7 +6,7 @@ from autograd import grad, hessian
 from numpy.linalg import norm
 
 # from ..inner_point.handlers.input_validation import check_expression, check_restr, check_point
-# from ..inner_poinr.handlers.prepocessing import prepare_all
+# from ..inner_point.handlers.prepocessing import prepare_all
 
 
 class PrimalDual:

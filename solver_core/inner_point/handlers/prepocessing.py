@@ -10,6 +10,14 @@ from sympy import sympify, Symbol, simplify
 from sympy.utilities.lambdify import lambdastr
 from typing import Optional, Callable
 import autograd.numpy as npa
+from copy import deepcopy
+
+try:
+    from solver_core.inner_point.FirstPhase import FirstPhase
+except ImportError:
+    from ..FirstPhase import FirstPhase
+
+FirstPhase
 
 
 # preprocessing
@@ -45,6 +53,7 @@ def prepare_all(function: str, restriction: str, method: str, started_point: Opt
     """
 
     func = sympify(function)
+    vars_ = set(func.free_symbols)
     func = to_callable(func)
     restriction = restriction.split(';')
     restr = []
@@ -55,6 +64,7 @@ def prepare_all(function: str, restriction: str, method: str, started_point: Opt
             right = right.strip()
             left, right = sympify(left), sympify(right)
             left -= right
+            vars_ |= set(left.free_symbols)
             left = to_callable(left)
             restr.append(left)
     if method == 'primal-dual':
@@ -67,6 +77,7 @@ def prepare_all(function: str, restriction: str, method: str, started_point: Opt
             left = left.strip()
             right = right.strip()
             left, right = sympify(left), sympify(right)
+            vars_ |= set(left.free_symbols)
             left -= right
             left = to_callable(left)
             restr.append(left)
@@ -81,15 +92,44 @@ def prepare_all(function: str, restriction: str, method: str, started_point: Opt
             right = right.strip()
             left, right = sympify(left), sympify(right)
             left -= right
+            vars_ |= set(left.free_symbols)
             left = to_callable(left)
             restr.append(left)
-    coords = started_point.split(';')
-    point = []
-    for i in range(len(coords)):
-        point.append(float(coords[i].strip()))
-    point = np.array(point)
+    if started_point != '' and started_point != 'None':
+        coords = started_point.split(';')
+        point = []
+        for i in range(len(coords)):
+            point.append(float(coords[i].strip()))
+        point = np.array(point)
+    else:
+        if method == 'Newton':
+            raise ValueError
+        n_vars = int(str(max(list(vars_), key=lambda x: int(str(x)[1:])))[1:])
+        rewrited_restrs = []
+        for r in restr:
+            func = deepcopy(r)
+            rewrited = rewrite(func)
+            rewrited_restrs.append(rewrited)
+        for i in range(5):
+            try:
+                point = FirstPhase(n_vars, rewrited_restrs).solve()
+            except np.linalg.LinAlgError:
+                print(f'{i+1} попытка найти начальную точку провалилась, попробуем запустить новую итерацию.')
+            else:
+                break
+        else:
+            raise ValueError('Не удалось найти начальную точку. Попробуйте запустить еще раз или проверьте совместность системы')
+
     return func, restr, point
 
+
+def rewrite(restr: Callable) -> Callable:
+    """
+    Функция переделывает.
+    """
+    r = deepcopy(restr)
+    new = lambda x: -r(x)
+    return new
 
 def to_callable(expression: sympy.core) -> Callable:
     """
@@ -160,5 +200,9 @@ def make_matrix(expressions: list, xs: set) -> tuple:
 
 
 if __name__ == '__main__':
-    f, restr, p = prepare_all('x1**2 - x3', 'x2 - x4 = 3', 'Newton', '0;0;0;0')
-    print(restr[0]([1, 3, 2, 0]))
+    f = 'x1**2 + x2**2 + (0.5*1*x1 + 0.5*2*x2)**2 + (0.5*1*x1 + 0.5*2*x2)**4'
+    subject_to = 'x1+x2<=0;2*x1-3*x2<=1'
+
+    f, restr, p = prepare_all(f, subject_to, 'primal-dual', '')
+    for i in restr:
+        print(i(p) >= 0)
