@@ -29,7 +29,7 @@ class FirstPhase:
                  restrictions: list,
                  eps: Optional[float] = 1e-12):
 
-        self.x = np.random.random(n) * np.random.randint(1, 1000)
+        self.x = np.random.random(n)
 
         self.restrictions = restrictions
         self.s = max([i(self.x) for i in self.restrictions]) + 1
