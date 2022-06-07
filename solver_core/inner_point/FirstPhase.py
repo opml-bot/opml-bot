@@ -59,7 +59,7 @@ class FirstPhase:
                     break
             else:
                 break
-        self.mu += 2
+            self.mu += 2
         return self.x
 
     def lagrange(self, x):
