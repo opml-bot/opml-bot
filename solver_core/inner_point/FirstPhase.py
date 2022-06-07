@@ -60,7 +60,7 @@ class FirstPhase:
                 if i(self.x) > 0:
                     break
             else:
-                break
+                return self.x
             self.mu += 2
         return self.x
 
