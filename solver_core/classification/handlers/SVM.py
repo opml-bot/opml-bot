@@ -98,7 +98,7 @@ class SVM:
         print(self.X_test.shape)
         print(model.intercept_,model.coef_[0])
         omega = model.intercept_.tolist()+ model.coef_[0].tolist()
-        return np.concatenate((self.X_test, y_pred.T.reshape(-1,1)), axis=1), omega
+        return np.concatenate((self.X_test, y_pred.T.reshape(-1,1)), axis=1)
 
 
 if __name__ == "__main__":
@@ -108,6 +108,5 @@ if __name__ == "__main__":
     y_train = y[:80, :]
     X_test = X[80:, :]
     y_test = y[80:, :]
-    pred, omega = SVM(X_train, y_train, X_test).solve
+    pred = SVM(X_train, y_train, X_test).solve
     print(pred, y_test)
-    print(omega)

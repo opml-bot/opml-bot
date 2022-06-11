@@ -76,7 +76,7 @@ class LogisticRegression:
 
         y_pred = model.fit(X_train_poly,self.y_train).predict(X_test_poly)
         omega = [model.intercept_, model.coef_]
-        return np.concatenate((self.X_test, y_pred), axis=1), omega
+        return np.concatenate((self.X_test, y_pred), axis=1)
 
 
 if __name__ == "__main__":
@@ -86,6 +86,5 @@ if __name__ == "__main__":
     y_train = y[:80, :]
     X_test = X[80:, :]
     y_test = y[80:, :]
-    pred, omega = LogisticRegression(X_train, y_train, X_test, degree = 1,regularization=True).solve()
+    pred = LogisticRegression(X_train, y_train, X_test, degree = 1,regularization=True).solve()
     print(pred, y_test)
-    print(omega)
