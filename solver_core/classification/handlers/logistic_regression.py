@@ -1,6 +1,8 @@
 import numpy as np
 from typing import Optional
 
+from sklearn.preprocessing import PolynomialFeatures
+
 
 class LogisticRegression:
     """
@@ -46,6 +48,8 @@ class LogisticRegression:
                  delta_w: Optional[float] = 100,
                  max_iter: Optional[int] = 500,
                  regularization: Optional[bool] = False,
+                 type: Optional[str] = 'linear',
+                 degree: Optional[int] = 1,
                  draw_flag: Optional[bool] = False):
         self.X_train = X_train
         self.y_train = y_train
@@ -57,6 +61,8 @@ class LogisticRegression:
         self.max_iter = max_iter
         self.alpha = alpha
         self.mu = mu
+        self.degree = degree
+        self.type = type
 
     def solve(self):
         """
@@ -67,10 +73,10 @@ class LogisticRegression:
         func: str
             Массив предсказанных классов в формате [x_new|t_new], где t - класс.
 
-        koefs: np.ndarray
-            Коэфициенты регрессии w.
-
         """
+        if self.type != 'linear':
+            poly = PolynomialFeatures(degree=self.degree)
+            poly.fit_transform(self.X_train)
         self.X_train = np.concatenate((np.ones_like(X_train[:,0:1]), X_train), axis=1)
         self.omega = np.linalg.inv(self.X_train.T @ self.X_train) @ self.X_train.T @ self.y_train
         i = 0
@@ -96,7 +102,7 @@ class LogisticRegression:
         y_pred = 1 / (1 + np.exp(-z))
         mu = np.mean(y_pred.flatten())
         y_pred = np.array([1 if i[0] >= mu else 0 for i in y_pred]).reshape((-1, 1))
-        return np.concatenate((self.X_test, y_pred), axis=1), self.omega
+        return np.concatenate((self.X_test, y_pred), axis=1)
 
 
 if __name__ == "__main__":
@@ -106,6 +112,6 @@ if __name__ == "__main__":
     y_train = y[:80, :]
     X_test = X[80:, :]
     y_test = y[80:, :]
-    pred, omega = LogisticRegression(X_train, y_train, X_test, regularization=True).solve()
+    pred = LogisticRegression(X_train, y_train, X_test,\
+                                     regularization=True, type = 'poly', degree = 2).solve()
     print(pred, y_test)
-    print(omega)
