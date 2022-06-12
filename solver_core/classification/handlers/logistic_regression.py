@@ -34,6 +34,12 @@ class LogisticRegression:
     regularization: Optional[bool] = False
         Флаг применения регуляризации. Принимает значения "True" или "False.
 
+    type: Optional[str] = 'linear'
+        Тип классификации: линейная или полиномиальная. Принимает значения 'linear' и 'poly'.
+
+    degree: Optional[int] = 1
+        Показатель степени полиномиальной регрессии.
+
     draw_flag: Optional[bool] = False
         Флаг рисования результатов работы модели. Принимает значения "True" или "False.
 
