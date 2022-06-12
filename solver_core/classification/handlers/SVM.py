@@ -18,20 +18,14 @@ class SVM:
     X_test: np.ndarray
         Массив данных, на которых тестируется модель. Может быть одномерными и многомерными.
 
-    mu: Optional[float] = 0.5
-        Критерий, по которому отделяются классы в логистической регрессии.
-
     max_iter: Optional[int] = 500
         Максимальное количество итераций алгоритма.
 
-    delta_w: Optional[float] = 100
-        Параметр остановки алгоритма. Как только разница между результатами соседним итераций меньше чем данный параметр, алгоритм прекращает работу.
+    type: Optional[str] = 'linear'
+        Тип классификации: линейная или полиномиальная. Принимает значения 'linear' и 'poly'.
 
-    alpha: Optional[float] = 0.5
-        Степень влияния регуляризации. На этот коэфициент домножается регуляризация.
-
-    regularization: Optional[bool] = False
-        Флаг применения регуляризации. Принимает значения "True" или "False.
+    degree: Optional[int] = 1
+        Показатель степени полиномиальной регрессии.
 
     draw_flag: Optional[bool] = False
         Флаг рисования результатов работы модели. Принимает значения "True" или "False.
@@ -41,15 +35,19 @@ class SVM:
     def __init__(self,
                  X_train: np.ndarray,
                  y_train: np.ndarray,
-                 X_test: np.ndarray):
-        # learning_rate: Optional[float] = 0.01,
-        # max_iter: Optional[int] = 500)\
+                 X_test: np.ndarray,
+                 max_iter: Optional[int] = 500,
+                 kernel: Optional[str] = 'linear',
+                 degree: Optional[int] = 2,
+                 draw_flag: Optional[bool] = False):
 
         self.X_train = X_train
         self.y_train = y_train
         self.X_test = X_test
-        # self.max_iter = max_iter
-        # self.learning_rate = learning_rate
+        self.max_iter = max_iter
+        self.kernel = kernel
+        self.degree = degree
+        self.draw_flag = draw_flag
 
     @property
     def solve(self):
@@ -91,7 +89,7 @@ class SVM:
         print(self.X_test.shape,self.omega.shape)
         y_pred = np.sign(self.X_test@self.omega.T + b_opt)'''
 
-        model = SVC(kernel='linear')
+        model = SVC(kernel=self.kernel, degree = self.degree, max_iter = self.max_iter)
         model.fit(self.X_train, self.y_train)
         y_pred = model.predict(self.X_test)
         print(y_pred.T.reshape(-1,1).shape)
