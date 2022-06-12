@@ -7,101 +7,70 @@ Original file is located at
     https://colab.research.google.com/drive/1qkHSNTthNqjfHXVwCOlrDDOvF9GW0QZA
 """
 
-import numpy as np
-from sympy import *
-import math
+from fractions import Fraction
+from warnings import warn
+import copy
+import pandas as pd
 
 from solver_core.gomori.utils import *
 
-def gomori(matrix, function, basis, analysis):
+def gomory_solve(num_vars: int, constraints: list, objective_function: tuple):
+    """
+    Решите задачу целочисленного линейного программирования с помощью заданных ограничений и целевой функции.
+    Изначально проверяется условие целочисленного значения решения, полученного симплексным методом,
+    если решение целочисленное – оно выводится в ответ.
+    На каждой итерации цикла проверяется условие целочисленной оптимальности целевой функции.
+    Если это условие выполнено, задача считается решенной и итерации прекращаются, возвращается результирующее целочисленное оптимальное значение функции и целочисленный оптимальный план.
+    В противном случае выполняется один шаг алгоритма метода плоскости среза (метод Гомори).:
+    - формирование вырезки и добавление ее в текущую симплексную таблицу
+    - выполнение одного шага симплексного метода
+    num_vars: number of variables
+    constraints: list of constraints
+         (for example ['1x_1 + 2x_2 >= 4', '2x_3 + 3x_1 <= 5', 'x_3 + 3x_2 = 6'])
+    objective_function: tuple in which two string values are specified: objective function
+         (for example, '2x_1 + 4x_3 + 5x_2') optimization direction ('min' or 'max')
+    return:
+    integer_optimum (float): оптимальное целочисленное значение целевой функции, полученное методом Гомори
+    integer_optimal_plane (list): оптимальный целочисленный план, полученный методом Гомори
+    gomory_history (list): список, содержащий шаги преобразования симплексной таблицы
+    basic_vars_history (list): список, содержащий шаги преобразования basic_vars
+    """
+    simplex_vals, simplex_solution, simplex_history, simplex_basic_vars_history = simplex_solve(
+        num_vars,
+        constraints,
+        objective_function
+    )
+    simplex_table = list(simplex_history.values())[-1]
+    basic_vars = list(simplex_basic_vars_history.values())[-1]
 
-    matrix_1, function_1, basis_1 = simplex_method(matrix, function, basis, analysis)
+    gomory_history = simplex_history
+    basic_vars_history = simplex_basic_vars_history
+    if check_integer_condition(simplex_table):
+        return simplex_table[0][-1], simplex_solution
+    gomory_history[f'Initial Gomory-method'] = copy.deepcopy(simplex_table)
+    basic_vars_history[f'Initial Gomory-method'] = copy.deepcopy(basic_vars)
+    step = 1
+    while not check_integer_condition(simplex_table):
+        simplex_table, basic_vars = add_clipping(simplex_table, basic_vars)
+        key_row = get_key_row(simplex_table)
+        key_column = get_key_column(simplex_table, key_row)
+        simplex_table, basic_vars = simplex_step(simplex_table, basic_vars, key_column, key_row)
+        gomory_history[f'Gomory method step {step}'] = copy.deepcopy(simplex_table)
+        basic_vars_history[f'Gomory method step {step}'] = copy.deepcopy(basic_vars)
+        step += 1
+    integer_optimum = simplex_table[0][-1]
+    integer_optimal_plane = create_solution(simplex_table, basic_vars, num_vars)
 
-    xs = np.arange(len(matrix_1))+1
+    return integer_optimum, integer_optimal_plane, gomory_history, basic_vars_history
 
-    flag = False
-
-    for i in range(len(matrix_1[:, 0])):
-      if math.modf(matrix_1[:, 0][i])[0] > 0:
-        flag = True
-        
-    while flag:
-      
-      max = 0
-      pos = 0
-      for i in range(len(matrix_1[:, 0])):
-        if math.modf(matrix_1[:, 0][i])[0] > max:
-          max = math.modf(matrix_1[:, 0][i])[0]
-          pos = i
-
-      small_parts = [-max]
-      for i in matrix_1[pos][1:]:
-        if math.modf(i)[0] >= 0:
-          small_part = -math.modf(i)[0]
-        else:
-          small_part = -(1 + math.modf(i)[0])
-        small_parts.append(small_part)
-      small_parts.append(1)
-
-      add = []
-      len_m = len(matrix_1)
-      for i in range(len_m):
-        add.append(0)
-
-      matrix_2 = []
-      for i in range(len(matrix_1)):
-        a = list(matrix_1[i])
-        a.append(add[i])
-        matrix_2.append(a)
-      matrix_2.append(small_parts)
-      matrix_1 = np.array(matrix_2)
-
-      function_1 = np.append(function_1,0)
-      function_1 *= -1
-      basis_1 = np.append(basis_1,len(function_1))
-
-     
-      index_output = len(matrix_1)-1
-
-      matrix_copy = matrix_1[index_output][1:]
-      min_f_x = 1000
-      index_input = 0
-      for i in range(len(function_1)):
-        if matrix_copy[i] != 0 and (function_1[i]/matrix_copy[i]) < min_f_x:
-          min_f_x  = (function_1[i]/matrix_copy[i])
-          index_input = i
-      index_input+=1
-      
-      basis_1[-1] = index_input
-      matrix_1 = recount(matrix_1,index_input,index_output)
-      function_1 = recount_function(matrix_1,index_input,index_output,function_1)
-
-      check = 0
-      for i in xs:
-        if i in basis_1:
-          check+=1
-      
-      check_2 = 0 
-      for i in range(len(matrix_1[:, 0])):
-        if math.modf(matrix_1[:, 0][i])[0] == 0:
-          check_2+=1
-
-      if check == len(xs) and check_2 == len(xs):
-        flag = False 
-
-    result = list()
-    for i in xs:
-      for j in range(len(basis_1)):
-        if basis_1[j] == i:
-          result.append(matrix_1[:,0][j])
-
-    return(result)
-
-f = '4*x1 + 5*x2 + 6*x3'
-consts = ['1*x1 + 2*x2 + 3*x3 <= 35','4*x1 + 3*x2 + 2*x3 <= 45','3*x1 + 1*x2 + 1*x3 <= 40']
-A,B,C,grades = restrict(consts,f,'max')
-
-mat, fun, bas = canonization(A, B, C, grades)
-
-gomori(mat, fun, bas, True)
-
+if __name__ == '__main__':
+    objective_function = ('maximize', '8x_1 + 6x_2')
+    constraints = ['2x_1 + 5x_2 <= 19', '4x_1 + 1x_2 <= 16']
+    num_vars = 2
+    gomory_vals, gomory_solution, gomory_history, basic_vars_history = gomory_solve(
+        num_vars,
+        constraints,
+        objective_function
+    )
+    print('Gomory method steps:')
+    print_history_table(gomory_history, basic_vars_history, gomory_solution)
