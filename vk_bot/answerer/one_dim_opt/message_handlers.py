@@ -69,7 +69,7 @@ class Handlers:
         """
 
         try:
-            func = check_f
+            func = check
         except Exception as e:
             return self.error(e)
 
