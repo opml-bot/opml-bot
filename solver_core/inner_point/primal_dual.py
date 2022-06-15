@@ -5,7 +5,6 @@ import autograd.numpy as npa
 from autograd import grad, hessian
 from numpy.linalg import norm
 
-from solver_core.inner_point.FirstPhase import FirstPhase
 
 
 # from ..inner_point.handlers.input_validation import check_expression, check_restr, check_point
