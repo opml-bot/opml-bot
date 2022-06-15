@@ -111,14 +111,14 @@ def check_restr(restr_str: str, method: str, splitter: Optional[str] = ';') -> s
                     splitt = '<='
                 left, right = g[i].split(splitt)
                 left, right = sympify(check_expression(left)), sympify(check_expression(right))
-                if splitt == '>=':
-                    left -= right
                 if splitt == '<=':
+                    left -= right
+                if splitt == '>=':
                     left = -left
                     right = -right
                     left -= right
                 right -= right
-                checked = str(left) + '>=' + str(right)
+                checked = str(left) + '<=' + str(right)
                 ans.append(checked)
             else:
                 raise ValueError(f'''Для метода {method} ограничения типа равенств пока
@@ -207,11 +207,11 @@ def check_point(point_str: str, function: str, restrs: str, method: str, splitte
 
     if method == 'primal-dual':
         for i in r:
-            if float(i.subs(d)) <= 0:
+            if float(i.subs(d)) < 0:
                 raise ValueError('Точка не внутренняя')
     if method == 'log_barrier':
         for i in r:
-            if float(i.subs(d)) <= 0:
+            if float(i.subs(d)) > 0:
                 raise ValueError('Точка не внутренняя')
     points = ';'.join(coords)
     return points

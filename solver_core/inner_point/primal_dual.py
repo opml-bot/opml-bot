@@ -5,8 +5,14 @@ import autograd.numpy as npa
 from autograd import grad, hessian
 from numpy.linalg import norm
 
+from solver_core.inner_point.FirstPhase import FirstPhase
+
+
 # from ..inner_point.handlers.input_validation import check_expression, check_restr, check_point
 # from ..inner_point.handlers.prepocessing import prepare_all
+# from solver_core.inner_point.handlers.input_validation import *
+# from solver_core.inner_point.handlers.prepocessing import prepare_all
+
 
 
 class PrimalDual:
@@ -149,25 +155,25 @@ if __name__ == "__main__":
     # start_point = np.array([0.5, 0.5])
     # vars = get_variables(f)
     # третий пример, точка (1.5, 1.5)
-    # f = '3*x1 + 5*x2'
-    # subject_to = ['x1 <= 3', '2*x2<=12', '3*x1+2*x2<=18', 'x1>=0', 'x2>=0']
-    # right_point = (2, 6)
-    # start_point = np.array([2, 6.])
-    # vars = get_variables(f)
-    # правильный пример (zakharov)
-    # def f(x):
-    #     return x[0] ** 2 + x[1] ** 2 + (0.5 * 1 * x[0] + 0.5 * 2 * x[1]) ** 2 + (0.5 * 1 * x[0] + 0.5 * 2 * x[1]) ** 4
+    f = '3*x1 + 5*x2'
+    subject_to = 'x1 <= 3;2*x2<=12;3*x1+2*x2<=18;x1>=0;x2>=0'
+    right_point = (2, 6)
+    start_point = '2; 6'
+    start_point = ''
 
-    f = 'x1**2 + x2**2 + (0.5*1*x1 + 0.5*2*x2)**2 + (0.5*1*x1 + 0.5*2*x2)**4'
-    subject_to = 'x1+x2<=0;2*x1-3*x2<=1'
-    zakharov_point_min = [0, 0]
-    # zakharov_point_start = np.array([-5, 4.])
-    zakharov_point_start = '-5;4'
+    # правильный пример (zakharov)
+
+    # f = 'x1**2 + x2**2 + (0.5*1*x1 + 0.5*2*x2)**2 + (0.5*1*x1 + 0.5*2*x2)**4'
+    # subject_to = 'x1+x2<=0;2*x1-3*x2<=1'
+    # zakharov_point_min = [0, 0]
+    # # zakharov_point_start = np.array([-5, 4.])
+    # zakharov_point_start = '-5;4'
+    # zakharov_point_start = ''
 
     # input_validation
     f = check_expression(f)
     subject_to = check_restr(subject_to, method='primal-dual')
-    zakharov_point_start = check_point(zakharov_point_start, f, subject_to, 'primal-dual')
+    zakharov_point_start = check_point(start_point, f, subject_to, 'primal-dual')
     # preprocessing
     f, subject_to, zakharov_point_start = prepare_all(f, subject_to, 'primal-dual', zakharov_point_start)
     # solver

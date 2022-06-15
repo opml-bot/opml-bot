@@ -12,12 +12,13 @@ from typing import Optional, Callable
 import autograd.numpy as npa
 from copy import deepcopy
 
+
+
 try:
     from solver_core.inner_point.FirstPhase import FirstPhase
 except ImportError:
     from ..FirstPhase import FirstPhase
 
-FirstPhase
 
 
 # preprocessing
@@ -115,7 +116,7 @@ def prepare_all(function: str, restriction: str, method: str, started_point: Opt
                 point = FirstPhase(n_vars, rewrited_restrs).solve()
             except np.linalg.LinAlgError as e:
                 print(f'{i+1} попытка найти начальную точку провалилась, попробуем запустить новую итерацию.')
-            except OverflowError as e:
+            except (OverflowError, ValueError) as e:
                 print(f'{i + 1} попытка найти начальную точку провалилась, попробуем запустить новую итерацию.')
             else:
                 break
@@ -216,5 +217,6 @@ if __name__ == '__main__':
     subject_to = 'x1+x2<=0;2*x1-3*x2<=1'
 
     f, restr, p = prepare_all(f, subject_to, 'primal-dual', '')
+    print(p)
     for i in restr:
         print(i(p) >= 0)

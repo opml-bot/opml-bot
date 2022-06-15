@@ -30,7 +30,6 @@ class FirstPhase:
                  eps: Optional[float] = 1e-12):
 
         self.x = np.random.random(n)
-
         self.restrictions = restrictions
         self.s = max([i(self.x) for i in self.restrictions]) + 1
         self.eps = eps
@@ -48,7 +47,7 @@ class FirstPhase:
 
         while self.s - 1 > 0:
             if np.isnan(self.x).any():
-                break
+                raise ValueError('В ходе работы получился None.')
             self.x = self.x - step
 
             try:
@@ -56,7 +55,6 @@ class FirstPhase:
             # -------------------------------------------------------
             except np.linalg.LinAlgError as e:
                 for i in self.restrictions:
-
                     if i(self.x) > 0:
                         break
                 else:
@@ -64,14 +62,6 @@ class FirstPhase:
             # -------------------------------------------------------
             self.s = max([i(self.x) for i in self.restrictions]) + 1
             self.mu += 1
-
-            for i in self.restrictions:
-
-                if i(self.x) > 0:
-                    break
-            else:
-                return self.x
-            self.mu += 2
         return self.x
 
     def lagrange(self, x):
