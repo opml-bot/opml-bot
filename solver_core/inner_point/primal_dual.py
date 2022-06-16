@@ -9,8 +9,8 @@ from numpy.linalg import norm
 
 # from ..inner_point.handlers.input_validation import check_expression, check_restr, check_point
 # from ..inner_point.handlers.prepocessing import prepare_all
-from solver_core.inner_point.handlers.input_validation import *
-from solver_core.inner_point.handlers.prepocessing import prepare_all
+# from solver_core.inner_point.handlers.input_validation import *
+# from solver_core.inner_point.handlers.prepocessing import prepare_all
 
 
 
