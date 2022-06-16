@@ -11,8 +11,8 @@ GRID_WIDTH = 1
 
 
 def draw_3d(points_of_function: pd.DataFrame,
-            points_of_restriction: Optional[pd.DataFrame] = None,
-            critical_points: Optional[pd.DataFrame] = None) -> go.Figure:
+            points_of_restriction: Optional[pd.DataFrame] = [None],
+            critical_points: Optional[pd.DataFrame] = [None]) -> go.Figure:
     """
     Функция рисует два графика и возвращает plotly Figure. Первый график 3-d поверхность, второй график - линии уровня.
     На первом и втором графиках рисуются точки critical_points и ограничивающая функция.
@@ -21,9 +21,9 @@ def draw_3d(points_of_function: pd.DataFrame,
     ----------
     points_of_function : pd.DataFrame
         Датафрейм, у которого индексы - это значения по оси x, столбцы - значения по оси y, сами значения функции это матрица df.values.
-    points_of_restriction : Optional[pd.DataFrame] = None
+    points_of_restriction : Optional[pd.DataFrame] = [None]
         Датафрейм с тремя столбцами x, y, z для ограничивающей функции
-    critical_points : Optional[pd.DataFrame] = None критической точки.
+    critical_points : Optional[pd.DataFrame] = [None] критической точки.
 
     Returns
     -------
@@ -111,7 +111,7 @@ def draw_3d(points_of_function: pd.DataFrame,
                   row=1,
                   col=2)
 
-    if critical_points is not None and len(critical_points) > 0:
+    if critical_points is not [None] and len(critical_points) > 0:
 
         for type_point, points_of_function in critical_points.groupby('types'):
             fig.add_scatter3d(x=points_of_function.x,
@@ -214,14 +214,14 @@ def make_df_for_drawing(func,
     return points
 
 
-def save_fig_to_pic(fig: go.Figure, path: str, extensions: list) -> None:
+def save_fig_to_pic(fig: go.Figure, path: str, extensions: list) -> [None]:
     """
     Сохраняет график в нужных форматах
 
     :param fig: какой plotly график нужно сохранить
     :param path: путь с названием файла для сохранения без расширения
     :param extensions: список расширений
-    :return: None
+    :return: [None]
 
     Code examples::
 
