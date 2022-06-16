@@ -1,37 +1,33 @@
-def draw(X_train, y_train):
-    if X_train.shape[1] == 2:
+def draw(X_test, y_test, y_pred):
+    import numpy as np
+    if X_test.shape[1] == 2:
         import plotly.graph_objects as go
-        X_train_1 = X_train[np.argwhere(y_train == 1)[:, 0]]
-        X_train_2 = X_train[np.argwhere(y_train == 2)[:, 0]]
+        X = np.concatenate((X_test, y_test, y_pred), axis=1)
         fig = go.Figure()
-        fig.add_trace(go.Scatter(x=X_train_1[:, 0],
-                                 y=X_train_1[:, 1],
+        symb = ['circle' if i == np.unique(X[:, 2])[0] else 'square' for i in X[:, 2]]
+        col = ['red' if i == np.unique(X[:, 3])[0] else 'blue' for i in X[:, 3]]
+        fig.add_trace(go.Scatter(x=X[:, 0],
+                                 y=X[:, 1],
                                  mode='markers',
-                                 marker_color='red',
-                                 name='first'))
-        fig.add_trace(go.Scatter(x=X_train_2[:, 0],
-                                 y=X_train_2[:, 1],
-                                 mode='markers',
-                                 marker_color='blue',
-                                 name='second'))
-        fig.show()
-    elif X_train.shape[1] == 3:
+                                 marker=dict(
+                                     symbol=symb,
+                                     size=15,
+                                     color=col)))
+        return fig
+    elif X_test.shape[1] == 3:
         import plotly.graph_objects as go
-        X_train_1 = X_train[np.argwhere(y_train == 1)[:, 0]]
-        X_train_2 = X_train[np.argwhere(y_train == 2)[:, 0]]
+        X = np.concatenate((X_test, y_test, y_pred), axis=1)
         fig = go.Figure()
-        fig.add_trace(go.Scatter3d(x=X_train_1[:, 0],
-                                   y=X_train_1[:, 1],
-                                   z=X_train_1[:, 2],
+        symb = ['circle' if i == np.unique(X[:, 3])[0] else 'square' for i in X[:, 3]]
+        col = ['red' if i == np.unique(X[:, 4])[0] else 'blue' for i in X[:, 4]]
+        fig.add_trace(go.Scatter3d(x=X[:, 0],
+                                   y=X[:, 1],
+                                   z=X[:, 2],
                                    mode='markers',
-                                   marker_color='red',
-                                   name='first'))
-        fig.add_trace(go.Scatter3d(x=X_train_2[:, 0],
-                                   y=X_train_2[:, 1],
-                                   z=X_train_2[:, 2],
-                                   mode='markers',
-                                   marker_color='blue',
-                                   name='second'))
-        fig.show()
+                                   marker=dict(
+                                       symbol=symb,
+                                       size=10,
+                                       color=col)))
+        return fig
     else:
         raise ValueError('Невозможно нарисовать')
