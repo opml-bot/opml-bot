@@ -35,6 +35,7 @@ class RadicalRegression:
                  delta_w: Optional[float] = 100,
                  max_iter: Optional[int] = 500,
                  type: Optional[str] = 'linear',
+                 degree: Optional[int] = 1,
                  draw_flag: Optional[bool] = False):
         self.X_train = X_train
         self.y_train = y_train
@@ -45,6 +46,7 @@ class RadicalRegression:
         self.max_iter = max_iter
         self.mu = mu
         self.type = type
+        self.degree = degree
 
     def solve(self):
         """
@@ -58,7 +60,7 @@ class RadicalRegression:
         """
         if self.type != 'linear':
             poly = PolynomialFeatures(degree=self.degree)
-            poly.fit_transform(self.X_train)
+            self.X_train = poly.fit_transform(self.X_train)
         self.X_train = np.concatenate((np.ones_like(X_train[:,0:1]), X_train), axis=1)
         self.omega = np.linalg.inv(self.X_train.T @ self.X_train) @ self.X_train.T @ self.y_train
         i = 0
@@ -86,11 +88,12 @@ class RadicalRegression:
 
 
 if __name__ == "__main__":
-    X = np.random.randint(21, size=(100, 2))
-    y = np.array([1 if i[0] > 10 and i[1] > 10 else 0 for i in X]).reshape((-1, 1))
-    X_train = X[:80, :]
-    y_train = y[:80, :]
-    X_test = X[80:, :]
-    y_test = y[80:, :]
-    pred = RadicalRegression(X_train, y_train, X_test).solve()
+    X = np.random.randint(100, size=(500, 2))
+    # y = np.array([1 if i[0] > 5 and i[1] > 5 else 0 for i in X]).reshape((-1, 1))
+    y = np.array([1 if (i[0] - 50) ** 2 + (i[1] - 50) ** 2 <= 600 else 0 for i in X]).reshape((-1, 1))
+    X_train = X[:int(0.8 * 500), :]
+    y_train = y[:int(0.8 * 500), :]
+    X_test = X[int(0.8 * 500):, :]
+    y_test = y[int(0.8 * 500):, :]
+    pred = RadicalRegression(X_train, y_train, X_test, draw_flag=1, type='poly', degree = 2).solve()
     print(pred, y_test)

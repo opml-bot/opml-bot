@@ -42,7 +42,6 @@ class SVM:
                  kernel: Optional[str] = 'linear',
                  degree: Optional[int] = 2,
                  draw_flag: Optional[bool] = False):
-
         self.X_train = X_train
         self.y_train = y_train
         self.X_test = X_test
@@ -91,23 +90,21 @@ class SVM:
         print(self.X_test.shape,self.omega.shape)
         y_pred = np.sign(self.X_test@self.omega.T + b_opt)'''
 
-        model = SVC(kernel=self.kernel, degree = self.degree, max_iter = self.max_iter)
+        model = SVC(kernel=self.kernel, degree=self.degree, max_iter=self.max_iter)
         model.fit(self.X_train, self.y_train)
-        y_pred = model.predict(self.X_test).T.reshape(-1,1)
-        print(y_pred.T.reshape(-1,1).shape)
-        print(self.X_test.shape)
-        print(model.intercept_,model.coef_[0])
+        y_pred = model.predict(self.X_test).T.reshape(-1, 1)
         if self.draw_flag:
             draw(X_test, y_test, y_pred).show()
         return np.concatenate((self.X_test, y_pred), axis=1)
 
 
 if __name__ == "__main__":
-    X = np.random.randint(21, size=(100, 2))
-    y = np.array([1 if i[0] > 10 and i[1] > 10 else 0 for i in X]).reshape((-1, 1))
-    X_train = X[:80, :]
-    y_train = y[:80, :]
-    X_test = X[80:, :]
-    y_test = y[80:, :]
-    pred = SVM(X_train, y_train, X_test, max_iter = 100, draw_flag=1).solve
+    X = np.random.randint(100, size=(500, 2))
+    # y = np.array([1 if i[0] > 10 and i[1] > 10 else 0 for i in X]).reshape((-1, 1))
+    y = np.array([1 if (i[0] - 50) ** 2 + (i[1] - 50) ** 2 <= 600 else 2 for i in X]).reshape((-1, 1))
+    X_train = X[:int(0.8*500), :]
+    y_train = y[:int(0.8*500), :]
+    X_test = X[int(0.8*500):, :]
+    y_test = y[int(0.8*500):, :]
+    pred = SVM(X_train, y_train, X_test, max_iter=100, draw_flag=1, kernel='poly', degree=6).solve
     print(pred, y_test)
