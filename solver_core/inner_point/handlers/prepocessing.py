@@ -96,6 +96,7 @@ def prepare_all(function: str, restriction: str, method: str, started_point: Opt
             vars_ |= set(left.free_symbols)
             left = to_callable(left)
             restr.append(left)
+    # начальная точка
     if started_point != '' and started_point != 'None':
         coords = started_point.split(';')
         point = []
@@ -107,16 +108,20 @@ def prepare_all(function: str, restriction: str, method: str, started_point: Opt
             raise ValueError
         n_vars = int(str(max(list(vars_), key=lambda x: int(str(x)[1:])))[1:])
         rewrited_restrs = []
-        for r in restr:
-            func = deepcopy(r)
-            rewrited = rewrite(func)
-            rewrited_restrs.append(rewrited)
+        if method == 'primal-dual':
+            for r in restr:
+                func = deepcopy(r)
+                rewrited = rewrite(func)
+                rewrited_restrs.append(rewrited)
+            restr = rewrited_restrs
         for i in range(5):
             try:
-                point = FirstPhase(n_vars, rewrited_restrs).solve()
+                point = FirstPhase(n_vars, restr).solve()
             except np.linalg.LinAlgError as e:
+
                 print(f'{i+1} попытка найти начальную точку провалилась, попробуем запустить новую итерацию.')
             except (OverflowError, ValueError) as e:
+
                 print(f'{i + 1} попытка найти начальную точку провалилась, попробуем запустить новую итерацию.')
             else:
                 break
@@ -163,6 +168,7 @@ def to_callable(expression: sympy.core) -> Callable:
     str_vars = sorted(str_vars, key=lambda x: int(x[1:]), reverse=True)
     dict_for_vars = {i: f'x[{int(i[1:]) - 1}]' for i in str_vars}
     func = lambdastr(['x'], expression)
+
     for i in str_vars:
         i = str(i)
         func = func.replace(i, dict_for_vars[i])

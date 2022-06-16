@@ -35,7 +35,9 @@ class FirstPhase:
         self.eps = eps
         self.mu = 1
 
+
     def solve(self):
+
         for i in self.restrictions:
             if i(self.x) > 0:
                 break
@@ -45,7 +47,7 @@ class FirstPhase:
         l_grad = grad(self.lagrange)
         step = np.linalg.inv(l_hess(self.x)) @ l_grad(self.x)
 
-        while self.s - 1 > 0:
+        while self.s - 1. > 0:
             if np.isnan(self.x).any():
                 raise ValueError('В ходе работы получился None.')
             self.x = self.x - step
@@ -58,11 +60,11 @@ class FirstPhase:
                     if i(self.x) > 0:
                         break
                 else:
-                    return self.x
+                    return np.round(self.x, 5)
             # -------------------------------------------------------
             self.s = max([i(self.x) for i in self.restrictions]) + 1
             self.mu += 1
-        return self.x
+        return np.round(self.x, 5)
 
     def lagrange(self, x):
         l = self.s*self.mu

@@ -30,7 +30,6 @@ def check_expression(expression: str) -> str:
 
     if expression.find('–') != -1:
         expression = expression.replace('–', '-')
-
     checker = compile(expression, '<string>', 'eval')  # Может выдать SyntaxError, если выражение некорректно
     var_checker = re.compile(r'^x{1}[0-9]+$')
 
@@ -75,7 +74,7 @@ def check_restr(restr_str: str, method: str, splitter: Optional[str] = ';') -> s
                 if g[i].count('=') != 1:
                     raise ValueError(f'Неправильно задано ограничение {g[i]}')
                 left, right = g[i].split('=')
-                left, right = sympify(check_expression(left)), sympify(check_expression(right))
+                left, right = sympify(check_expression(left.strip())), sympify(check_expression(right.strip()))
                 left = left - right
                 right = right - right
 
@@ -91,7 +90,7 @@ def check_restr(restr_str: str, method: str, splitter: Optional[str] = ';') -> s
             else:
                 raise ValueError(f'Неправильно задано ограничение {g[i]}')
             left, right = g[i].split(splitt)
-            left, right = sympify(check_expression(left)), sympify(check_expression(right))
+            left, right = sympify(check_expression(left.strip())), sympify(check_expression(right.strip()))
             if splitt == '>=':
                 left -= right
             if splitt == '<=':
@@ -110,7 +109,7 @@ def check_restr(restr_str: str, method: str, splitter: Optional[str] = ';') -> s
                 elif g[i].find('<=') != -1:
                     splitt = '<='
                 left, right = g[i].split(splitt)
-                left, right = sympify(check_expression(left)), sympify(check_expression(right))
+                left, right = sympify(check_expression(left.strip())), sympify(check_expression(right.strip()))
                 if splitt == '<=':
                     left -= right
                 if splitt == '>=':
