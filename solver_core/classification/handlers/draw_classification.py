@@ -4,30 +4,86 @@ def draw(X_test, y_test, y_pred):
         import plotly.graph_objects as go
         X = np.concatenate((X_test, y_test, y_pred), axis=1)
         fig = go.Figure()
-        symb = ['circle' if i == np.unique(X[:, 2])[0] else 'square' for i in X[:, 2]]
-        col = ['red' if i == np.unique(X[:, 3])[0] else 'blue' for i in X[:, 3]]
-        fig.add_trace(go.Scatter(x=X[:, 0],
-                                 y=X[:, 1],
+        fig.add_trace(go.Scatter(x=X[(X[:, 2] == np.unique(X[:, 2])[0]) & (X[:, 3] == np.unique(X[:, 3])[0])][:, 0],
+                                 y=X[(X[:, 2] == np.unique(X[:, 2])[0]) & (X[:, 3] == np.unique(X[:, 3])[0])][:, 1],
                                  mode='markers',
+                                 name='test 0 predict 0',
                                  marker=dict(
-                                     symbol=symb,
-                                     size=15,
-                                     color=col)))
+                                     symbol='circle',
+                                     size=10,
+                                     color='red')))
+        fig.add_trace(go.Scatter(x=X[(X[:, 2] == np.unique(X[:, 2])[0]) & (X[:, 3] == np.unique(X[:, 3])[1])][:, 0],
+                                 y=X[(X[:, 2] == np.unique(X[:, 2])[0]) & (X[:, 3] == np.unique(X[:, 3])[1])][:, 1],
+                                 mode='markers',
+                                 name='test 0 predict 1',
+                                 marker=dict(
+                                     symbol='circle',
+                                     size=10,
+                                     color='blue')))
+        fig.add_trace(go.Scatter(x=X[(X[:, 2] == np.unique(X[:, 2])[1]) & (X[:, 3] == np.unique(X[:, 3])[0])][:, 0],
+                                 y=X[(X[:, 2] == np.unique(X[:, 2])[1]) & (X[:, 3] == np.unique(X[:, 3])[0])][:, 1],
+                                 mode='markers',
+                                 name='test 1 predict 0',
+                                 marker=dict(
+                                     symbol='square',
+                                     size=10,
+                                     color='red')))
+        fig.add_trace(go.Scatter(x=X[(X[:, 2] == np.unique(X[:, 2])[1]) & (X[:, 3] == np.unique(X[:, 3])[1])][:, 0],
+                                 y=X[(X[:, 2] == np.unique(X[:, 2])[1]) & (X[:, 3] == np.unique(X[:, 3])[1])][:, 1],
+                                 mode='markers',
+                                 name='test 1 predict 1',
+                                 marker=dict(
+                                     symbol='square',
+                                     size=10,
+                                     color='blue')))
+        fig.update_layout(title="Результаты классификации на тестовой выборке", xaxis_title="X, у.е.",
+                          yaxis_title="Y, у.е.")
+        fig.update_traces(showlegend=True)
         return fig
     elif X_test.shape[1] == 3:
         import plotly.graph_objects as go
         X = np.concatenate((X_test, y_test, y_pred), axis=1)
         fig = go.Figure()
-        symb = ['circle' if i == np.unique(X[:, 3])[0] else 'square' for i in X[:, 3]]
-        col = ['red' if i == np.unique(X[:, 4])[0] else 'blue' for i in X[:, 4]]
-        fig.add_trace(go.Scatter3d(x=X[:, 0],
-                                   y=X[:, 1],
-                                   z=X[:, 2],
+        fig.add_trace(go.Scatter3d(x=X[(X[:, 3] == np.unique(X[:, 3])[0]) & (X[:, 4] == np.unique(X[:, 4])[0])][:, 0],
+                                   y=X[(X[:, 3] == np.unique(X[:, 3])[0]) & (X[:, 4] == np.unique(X[:, 4])[0])][:, 1],
+                                   z=X[(X[:, 3] == np.unique(X[:, 3])[0]) & (X[:, 4] == np.unique(X[:, 4])[0])][:, 2],
                                    mode='markers',
+                                   name='test 0 predict 0',
                                    marker=dict(
-                                       symbol=symb,
+                                       symbol='circle',
                                        size=10,
-                                       color=col)))
+                                       color='red')))
+        fig.add_trace(go.Scatter3d(x=X[(X[:, 3] == np.unique(X[:, 3])[0]) & (X[:, 4] == np.unique(X[:, 4])[1])][:, 0],
+                                   y=X[(X[:, 3] == np.unique(X[:, 3])[0]) & (X[:, 4] == np.unique(X[:, 4])[1])][:, 1],
+                                   z=X[(X[:, 3] == np.unique(X[:, 3])[0]) & (X[:, 4] == np.unique(X[:, 4])[1])][:, 2],
+                                   mode='markers',
+                                   name='test 0 predict 1',
+                                   marker=dict(
+                                       symbol='circle',
+                                       size=10,
+                                       color='blue')))
+        fig.add_trace(go.Scatter3d(x=X[(X[:, 3] == np.unique(X[:, 3])[1]) & (X[:, 4] == np.unique(X[:, 4])[0])][:, 0],
+                                   y=X[(X[:, 3] == np.unique(X[:, 3])[1]) & (X[:, 4] == np.unique(X[:, 4])[0])][:, 1],
+                                   z=X[(X[:, 3] == np.unique(X[:, 3])[1]) & (X[:, 4] == np.unique(X[:, 4])[0])][:, 2],
+                                   mode='markers',
+                                   name='test 1 predict 0',
+                                   marker=dict(
+                                       symbol='square',
+                                       size=10,
+                                       color='red')))
+        fig.add_trace(go.Scatter3d(x=X[(X[:, 3] == np.unique(X[:, 3])[1]) & (X[:, 4] == np.unique(X[:, 4])[1])][:, 0],
+                                   y=X[(X[:, 3] == np.unique(X[:, 3])[1]) & (X[:, 4] == np.unique(X[:, 4])[1])][:, 1],
+                                   z=X[(X[:, 3] == np.unique(X[:, 3])[1]) & (X[:, 4] == np.unique(X[:, 4])[1])][:, 2],
+                                   mode='markers',
+                                   name='test 1 predict 1',
+                                   marker=dict(
+                                       symbol='square',
+                                       size=10,
+                                       color='blue')))
+        fig.update_layout(title="Результаты классификации на тестовой выборке", xaxis_title="X, у.е.",
+                          yaxis_title="Y, у.е.")
+        fig.update_traces(showlegend=True)
+
         return fig
     else:
         raise ValueError('Невозможно нарисовать')

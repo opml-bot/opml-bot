@@ -116,13 +116,13 @@ class LogisticRegression:
 
 
 if __name__ == "__main__":
-    X = np.random.randint(21, size=(100, 3))
-    y = np.array([1 if i[0] > 10 and i[1] > 10 and i[2] > 10 else 0 for i in X]).reshape((-1, 1))
+    X = np.random.randint(21, size=(100, 2))
+    y = np.array([1 if i[0] > 5 and i[1] > 5 else 0 for i in X]).reshape((-1, 1))
     X_train = X[:80, :]
     y_train = y[:80, :]
     X_test = X[80:, :]
     y_test = y[80:, :]
     pred = LogisticRegression(X_train, y_train, X_test, \
-                              regularization=True,  draw_flag=1).solve()
+                              regularization=True,type='poly', degree=2,  draw_flag=1).solve()
     print(pred, y_test)
-# type='poly', degree=2,
+#

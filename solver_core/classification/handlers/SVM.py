@@ -2,6 +2,8 @@ import numpy as np
 from typing import Optional
 from sklearn.svm import SVC
 
+from solver_core.classification.handlers.draw_classification import draw
+
 
 class SVM:
     """
@@ -91,12 +93,13 @@ class SVM:
 
         model = SVC(kernel=self.kernel, degree = self.degree, max_iter = self.max_iter)
         model.fit(self.X_train, self.y_train)
-        y_pred = model.predict(self.X_test)
+        y_pred = model.predict(self.X_test).T.reshape(-1,1)
         print(y_pred.T.reshape(-1,1).shape)
         print(self.X_test.shape)
         print(model.intercept_,model.coef_[0])
-        omega = model.intercept_.tolist()+ model.coef_[0].tolist()
-        return np.concatenate((self.X_test, y_pred.T.reshape(-1,1)), axis=1)
+        if self.draw_flag:
+            draw(X_test, y_test, y_pred).show()
+        return np.concatenate((self.X_test, y_pred), axis=1)
 
 
 if __name__ == "__main__":
@@ -106,5 +109,5 @@ if __name__ == "__main__":
     y_train = y[:80, :]
     X_test = X[80:, :]
     y_test = y[80:, :]
-    pred = SVM(X_train, y_train, X_test).solve
+    pred = SVM(X_train, y_train, X_test, max_iter = 100, draw_flag=1).solve
     print(pred, y_test)
