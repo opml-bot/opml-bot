@@ -48,6 +48,7 @@ class LogisticRegression:
                  X_train: np.ndarray,
                  y_train: np.ndarray,
                  X_test: np.ndarray,
+                 y_test: np.ndarray,
                  alpha: Optional[float] = 0.5,
                  delta_w: Optional[float] = 100,
                  max_iter: Optional[int] = 500,
@@ -58,6 +59,7 @@ class LogisticRegression:
         self.X_train = X_train
         self.y_train = y_train
         self.X_test = X_test
+        self.y_test = y_test
         self.regularization = regularization
         self.draw_flag = draw_flag
         self.omega = np.zeros(X_train.shape[1] + 1)
@@ -124,7 +126,7 @@ if __name__ == "__main__":
     y_train = y[:int(0.8*500), :]
     X_test = X[int(0.8*500):, :]
     y_test = y[int(0.8*500):, :]
-    pred = LogisticRegression(X_train, y_train, X_test,\
+    pred = LogisticRegression(X_train, y_train, X_test,y_test,\
                               regularization=True,type='poly', degree=2,  draw_flag=1).solve()
     print(pred, y_test)
 #

@@ -28,7 +28,7 @@ class RadicalRegression:
                  X_train: np.ndarray,
                  y_train: np.ndarray,
                  X_test: np.ndarray,
-                 mu: Optional[float] = 0.5,
+                 y_test: np.ndarray,
                  delta_w: Optional[float] = 100,
                  max_iter: Optional[int] = 500,
                  type: Optional[str] = 'linear',
@@ -37,6 +37,7 @@ class RadicalRegression:
         self.X_train = X_train
         self.y_train = y_train
         self.X_test = X_test
+        self.y_test = y_test
         self.draw_flag = draw_flag
         self.omega = np.zeros(X_train.shape[1] + 1)
         self.delta_w = delta_w
@@ -95,5 +96,5 @@ if __name__ == "__main__":
     y_train = y[:int(0.8 * 500), :]
     X_test = X[int(0.8 * 500):, :]
     y_test = y[int(0.8 * 500):, :]
-    pred = RadicalRegression(X_train, y_train, X_test, draw_flag=1, type='poly', degree = 2).solve()
+    pred = RadicalRegression(X_train, y_train, X_test,y_test, draw_flag=1, type='poly', degree = 2).solve()
     print(pred, y_test)
