@@ -1,5 +1,6 @@
 from vk_api.vk_api import VkApiMethod
 
+from solver_core.one_dim_opt.handlers.input_validation import check_expression
 from vk_bot.answerer.one_dim_opt.keyboards import Keyboards
 from vk_bot.answerer.one_dim_opt.onedimopt import OneDimOpt
 from vk_bot.answerer.one_dim_opt.scripted_phrases import Phrases
@@ -58,9 +59,14 @@ class Handlers:
         self.response.set_text(Phrases.INPUT_FUNC)
         return self.response
 
-    def func(self) -> Response:
+    def func(self, text: str) -> Response:
         """
         Обработка введенной функции. Предложение ввести точность оптимизации.
+
+        Parameters
+        ----------
+        text : str
+            Текст сообщения, отправленного пользователем.
 
         Returns
         -------
@@ -69,11 +75,11 @@ class Handlers:
         """
 
         try:
-            func = check
+            func = check_expression(text)
+            self.onedimopt.update_func(func)
+
         except Exception as e:
             return self.error(e)
-
-
 
     def error(self, error: str) -> Response:
         """
