@@ -55,6 +55,7 @@ class RadicalRegression:
         koefs: np.ndarray
             Коэфициенты регрессии w.
         """
+        X_test_old = self.X_test
         if self.type != 'linear':
             poly = PolynomialFeatures(degree=self.degree)
             self.X_train = poly.fit_transform(self.X_train)
@@ -84,7 +85,7 @@ class RadicalRegression:
         y_pred = np.array([1 if i[0] >= mu else 0 for i in y_pred]).reshape((-1, 1))
         
         if self.draw_flag:
-            draw(self.X_test, self.y_test, y_pred).show()
+            draw(X_test_old, self.y_test, y_pred).show()
         return np.concatenate((self.X_test, y_pred), axis=1)
 
 
