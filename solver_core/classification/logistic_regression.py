@@ -3,7 +3,7 @@ from typing import Optional
 
 from sklearn.preprocessing import PolynomialFeatures
 
-from solver_core.classification.handlers.draw_classification import draw
+from .draw_classification import draw
 
 
 class LogisticRegression:
