@@ -98,7 +98,7 @@ class SVM:
         model = SVC(kernel=self.kernel, degree=self.degree, max_iter=self.max_iter)
         scaler = StandardScaler()
         scaler.fit(self.X_train)
-        model.fit(self.X_train, self.y_train)
+        model.fit(self.X_train, self.y_train.reshape(-1, 1))
         y_pred = model.predict(self.X_test).T.reshape(-1, 1)
         if self.draw_flag:
             draw(self.X_test, self.y_test, y_pred).show()
