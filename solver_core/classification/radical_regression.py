@@ -3,7 +3,7 @@ from typing import Optional
 from sklearn.kernel_approximation import RBFSampler
 from sklearn.preprocessing import PolynomialFeatures
 
-from draw_classification import draw
+from .draw_classification import draw
 
 class RadicalRegression:
     """
