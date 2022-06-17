@@ -87,12 +87,10 @@ class LogisticRegression:
         else:
             self.X_train = np.concatenate((np.ones_like(self.X_train[:, 0:1]), self.X_train), axis=1)
             self.X_test = np.concatenate((np.ones_like(self.X_test[:, 0:1]), self.X_test), axis=1)
-        print(self.X_train)
         self.omega = np.linalg.inv(self.X_train.T @ self.X_train) @ self.X_train.T @ self.y_train
         i = 0
         old_w = np.array([-(10 ** 3)] * len(self.omega))
         while np.sum((old_w - self.omega) ** 2) > self.delta_w and i < self.max_iter:
-            print(self.X_train.shape, self.omega.shape)
             z = self.X_train @ self.omega
             p = 1 / (1 + np.exp(-z))
             g = p * (1 - p)
@@ -100,7 +98,6 @@ class LogisticRegression:
             G = np.zeros((len(g), len(g)), float)
             np.fill_diagonal(G, g)
             E = np.zeros((g.shape[1], g.shape[1]), int)
-            print(E)
             np.fill_diagonal(E, 1)
             old_w = self.omega
             if self.regularization:
