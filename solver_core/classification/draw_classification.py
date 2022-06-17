@@ -1,6 +1,7 @@
 def draw(X_test, y_test, y_pred):
     import numpy as np
-    if X_test.shape[1] == 2:
+    print(X_test.shape[1])
+    if X_test.shape[1]-1 == 2:
         import plotly.graph_objects as go
         print(X_test.shape, y_test.shape, y_pred.shape)
         X = np.concatenate((X_test, y_test, y_pred), axis=1)
@@ -53,7 +54,7 @@ def draw(X_test, y_test, y_pred):
                           yaxis_title="Y, у.е.")
         fig.update_traces(showlegend=True)
         return fig
-    elif X_test.shape[1] == 3:
+    elif X_test.shape[1]-1 == 3:
         import plotly.graph_objects as go
         X = np.concatenate((X_test, y_test, y_pred), axis=1)
         fig = go.Figure()
