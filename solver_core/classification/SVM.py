@@ -38,6 +38,7 @@ class SVM:
                  X_train: np.ndarray,
                  y_train: np.ndarray,
                  X_test: np.ndarray,
+                 y_test: np.ndarray,
                  max_iter: Optional[int] = 500,
                  kernel: Optional[str] = 'linear',
                  degree: Optional[int] = 2,
@@ -45,6 +46,7 @@ class SVM:
         self.X_train = X_train
         self.y_train = y_train
         self.X_test = X_test
+        self.y_test = y_test
         self.max_iter = max_iter
         self.kernel = kernel
         self.degree = degree
@@ -94,7 +96,7 @@ class SVM:
         model.fit(self.X_train, self.y_train)
         y_pred = model.predict(self.X_test).T.reshape(-1, 1)
         if self.draw_flag:
-            draw(X_test, y_test, y_pred).show()
+            draw(self.X_test, self.y_test, y_pred).show()
         return np.concatenate((self.X_test, y_pred), axis=1)
 
 
@@ -106,5 +108,5 @@ if __name__ == "__main__":
     y_train = y[:int(0.8*500), :]
     X_test = X[int(0.8*500):, :]
     y_test = y[int(0.8*500):, :]
-    pred = SVM(X_train, y_train, X_test, max_iter=100, draw_flag=1, kernel='poly', degree=6).solve
+    pred = SVM(X_train, y_train, X_test,y_test, max_iter=100, draw_flag=1, kernel='poly', degree=6).solve
     print(pred, y_test)
