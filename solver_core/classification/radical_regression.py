@@ -1,5 +1,7 @@
 import numpy as np
 from typing import Optional
+
+from scipy.optimize import minimize
 from sklearn.preprocessing import PolynomialFeatures
 
 from .draw_classification import draw
@@ -58,7 +60,7 @@ class RadicalRegression:
                  max_iter: Optional[int] = 500,
                  type: Optional[str] = 'linear',
                  degree: Optional[int] = 1,
-                 c: Optional[float] = 0,
+                 c: Optional[float] = None,
                  draw_flag: Optional[bool] = False):
         self.X_train = X_train
         self.y_train = y_train
@@ -71,6 +73,7 @@ class RadicalRegression:
         self.type = type
         self.c = c
         self.degree = degree
+
 
     def solve(self):
         """
@@ -103,7 +106,9 @@ class RadicalRegression:
             old_w = self.omega
             self.omega = np.linalg.inv(self.X_train.T @ G @ self.X_train) @ self.X_train.T @ G @ u
             i += 1
-        r = ((self.X_test[:, 1:] - self.c) ** 2)
+        if self.c == None:
+            self.c = minimize(lambda c: ((self.X_test-c)**2).sum()**0.5,[100]*self.X_test.shape[1]).x[0]
+        r = np.array(((self.X_test[:,1:] - self.c)**2)**0.5)
         rbf = np.exp(-(0.000001 * r) ** 2)
         z = self.omega[0] + rbf @ self.omega[1:]
         y_pred = 1 / (1 + np.exp(-z))
@@ -123,5 +128,5 @@ if __name__ == "__main__":
     y_train = y[:int(0.8 * 500), :]
     X_test = X[int(0.8 * 500):, :]
     y_test = y[int(0.8 * 500):, :]
-    pred = RadicalRegression(X_train, y_train, X_test, y_test, draw_flag=1, c = 0).solve()
+    pred = RadicalRegression(X_train, y_train, X_test, y_test,type='poly',degree=2, draw_flag=1, c=0).solve()
     print(pred, y_test)
