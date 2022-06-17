@@ -96,7 +96,8 @@ class SVM:
         print(self.X_test.shape,self.omega.shape)
         y_pred = np.sign(self.X_test@self.omega.T + b_opt)'''
         model = SVC(kernel=self.kernel, degree=self.degree, max_iter=self.max_iter)
-        self.X_train = StandardScaler(self.X_train)
+        scaler = StandardScaler()
+        scaler.fit(self.X_train)
         model.fit(self.X_train, self.y_train)
         y_pred = model.predict(self.X_test).T.reshape(-1, 1)
         if self.draw_flag:
