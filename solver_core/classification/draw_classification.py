@@ -88,7 +88,7 @@ def draw(X_test, y_test, y_pred):
             pass
         try:
             fig.add_trace(go.Scatter3d(x=X[(X[:, 3] == np.unique(X[:, 3])[1]) & (X[:, 4] == np.unique(X[:, 4])[1])][:, 0],
-                                       y=X[(X[:, 3] == np.unique(X[:, 3])[1]) & (X[:, 4] == np.unique(X[:, 4])[1])][:, 1],
+                                       y=X[(X[:, 3] == np.unique(X[:, ы3])[1]) & (X[:, 4] == np.unique(X[:, 4])[1])][:, 1],
                                        z=X[(X[:, 3] == np.unique(X[:, 3])[1]) & (X[:, 4] == np.unique(X[:, 4])[1])][:, 2],
                                        mode='markers',
                                        name='test 1 predict 1',
