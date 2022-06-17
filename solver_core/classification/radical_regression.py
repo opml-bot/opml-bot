@@ -104,7 +104,7 @@ class RadicalRegression:
             old_w = self.omega
             self.omega = np.linalg.inv(self.X_train.T @ G @ self.X_train) @ self.X_train.T @ G @ u
             i += 1
-        r = ((self.X_test[:, 1:] - self.с) ** 2)
+        r = ((self.X_test[:, 1:] - self.c) ** 2)
         rbf = np.exp(-(0.0001 * r) ** 2)
         z = self.omega[0] + rbf @ self.omega[1:]
         y_pred = 1 / (1 + np.exp(-z))
