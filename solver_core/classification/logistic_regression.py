@@ -3,7 +3,7 @@ from typing import Optional
 
 from sklearn.preprocessing import PolynomialFeatures
 
-from .draw_classification import draw
+from draw_classification import draw
 
 
 class LogisticRegression:
@@ -80,11 +80,16 @@ class LogisticRegression:
         if self.type != 'linear':
             poly = PolynomialFeatures(degree=self.degree)
             self.X_train = poly.fit_transform(self.X_train)
-        self.X_train = np.concatenate((np.ones_like(self.X_train[:, 0:1]), self.X_train), axis=1)
+            self.X_test = poly.fit_transform(self.X_test)
+        else:
+            self.X_train = np.concatenate((np.ones_like(self.X_train[:, 0:1]), self.X_train), axis=1)
+            self.X_test = np.concatenate((np.ones_like(self.X_test[:, 0:1]), self.X_test), axis=1)
+        print(self.X_train)
         self.omega = np.linalg.inv(self.X_train.T @ self.X_train) @ self.X_train.T @ self.y_train
         i = 0
         old_w = np.array([-(10 ** 3)] * len(self.omega))
         while np.sum((old_w - self.omega) ** 2) > self.delta_w and i < self.max_iter:
+            print(self.X_train.shape, self.omega.shape)
             z = self.X_train @ self.omega
             p = 1 / (1 + np.exp(-z))
             g = p * (1 - p)
@@ -92,6 +97,7 @@ class LogisticRegression:
             G = np.zeros((len(g), len(g)), float)
             np.fill_diagonal(G, g)
             E = np.zeros((g.shape[1], g.shape[1]), int)
+            print(E)
             np.fill_diagonal(E, 1)
             old_w = self.omega
             if self.regularization:
@@ -101,7 +107,7 @@ class LogisticRegression:
                 self.omega = np.linalg.inv(self.X_train.T @ G @ self.X_train) @ self.X_train.T @ G @ u
             i += 1
 
-        z = self.omega[0] + self.X_test @ self.omega[1:]
+        z = self.omega[0] + self.X_test[:,1:] @ self.omega[1:]
         y_pred = 1 / (1 + np.exp(-z))
         mu = np.mean(y_pred.flatten())
         y_pred = np.array([1 if i[0] >= mu else 0 for i in y_pred]).reshape((-1, 1))
@@ -110,15 +116,15 @@ class LogisticRegression:
         return np.concatenate((self.X_test, y_pred), axis=1)
 
 
-# if __name__ == "__main__":
-#     X = np.random.randint(100, size=(500, 2))
-#     #y = np.array([1 if i[0] > 5 and i[1] > 5 else 0 for i in X]).reshape((-1, 1))
-#     y = np.array([1 if (i[0]-50)**2+(i[1]-50)**2 <= 600 else 0 for i in X]).reshape((-1, 1))
-#     X_train = X[:int(0.8*500), :]
-#     y_train = y[:int(0.8*500), :]
-#     X_test = X[int(0.8*500):, :]
-#     y_test = y[int(0.8*500):, :]
-#     pred = LogisticRegression(X_train, y_train, X_test,\
-#                               regularization=True,type='poly', degree=2,  draw_flag=1).solve()
-#     print(pred, y_test)
+if __name__ == "__main__":
+    X = np.random.randint(100, size=(500, 2))
+    #y = np.array([1 if i[0] > 5 and i[1] > 5 else 0 for i in X]).reshape((-1, 1))
+    y = np.array([1 if (i[0]-50)**2+(i[1]-50)**2 <= 600 else 0 for i in X]).reshape((-1, 1))
+    X_train = X[:int(0.8*500), :]
+    y_train = y[:int(0.8*500), :]
+    X_test = X[int(0.8*500):, :]
+    y_test = y[int(0.8*500):, :]
+    pred = LogisticRegression(X_train, y_train, X_test,\
+                              regularization=True,type='poly', degree=2,  draw_flag=1).solve()
+    print(pred, y_test)
 #
