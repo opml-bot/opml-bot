@@ -112,7 +112,7 @@ class LogisticRegression:
         mu = np.mean(y_pred.flatten())
         y_pred = np.array([1 if i[0] >= mu else 0 for i in y_pred]).reshape((-1, 1))
         if self.draw_flag:
-            draw(X_test, y_test, y_pred).show()
+            draw(self.X_test, self.y_test, y_pred).show()
         return np.concatenate((self.X_test, y_pred), axis=1)
 
 
