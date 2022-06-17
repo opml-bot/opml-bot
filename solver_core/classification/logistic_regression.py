@@ -48,7 +48,6 @@ class LogisticRegression:
                  X_train: np.ndarray,
                  y_train: np.ndarray,
                  X_test: np.ndarray,
-                 mu: Optional[float] = 0.5,
                  alpha: Optional[float] = 0.5,
                  delta_w: Optional[float] = 100,
                  max_iter: Optional[int] = 500,
@@ -111,15 +110,15 @@ class LogisticRegression:
         return np.concatenate((self.X_test, y_pred), axis=1)
 
 
-if __name__ == "__main__":
-    X = np.random.randint(100, size=(500, 2))
-    #y = np.array([1 if i[0] > 5 and i[1] > 5 else 0 for i in X]).reshape((-1, 1))
-    y = np.array([1 if (i[0]-50)**2+(i[1]-50)**2 <= 600 else 0 for i in X]).reshape((-1, 1))
-    X_train = X[:int(0.8*500), :]
-    y_train = y[:int(0.8*500), :]
-    X_test = X[int(0.8*500):, :]
-    y_test = y[int(0.8*500):, :]
-    pred = LogisticRegression(X_train, y_train, X_test,\
-                              regularization=True,type='poly', degree=2,  draw_flag=1).solve()
-    print(pred, y_test)
+# if __name__ == "__main__":
+#     X = np.random.randint(100, size=(500, 2))
+#     #y = np.array([1 if i[0] > 5 and i[1] > 5 else 0 for i in X]).reshape((-1, 1))
+#     y = np.array([1 if (i[0]-50)**2+(i[1]-50)**2 <= 600 else 0 for i in X]).reshape((-1, 1))
+#     X_train = X[:int(0.8*500), :]
+#     y_train = y[:int(0.8*500), :]
+#     X_test = X[int(0.8*500):, :]
+#     y_test = y[int(0.8*500):, :]
+#     pred = LogisticRegression(X_train, y_train, X_test,\
+#                               regularization=True,type='poly', degree=2,  draw_flag=1).solve()
+#     print(pred, y_test)
 #
