@@ -5,23 +5,46 @@ from sklearn.preprocessing import PolynomialFeatures
 
 from .draw_classification import draw
 
+
 class RadicalRegression:
     """
-    Модель для логистической регрессии с радиальными базисными функциями. Находит ....
+    Модель для логистической регрессии. Находит ....
+
     Parameters
     ----------
     X_train: np.ndarray
         Массив обучающих данных. Может быть одномерными и многомерными.
+
     y_train: np.ndarray
         Массив значений обучающих данных. Строго одномерный.
+
     X_test: np.ndarray
         Массив данных, на которых тестируется модель. Может быть одномерными и многомерными.
+
+    y_test: np.ndarray
+        Массив данных, верных значений тестовой выборки. Строго одномерный.
+
     max_iter: Optional[int] = 500
         Максимальное количество итераций алгоритма.
+
     delta_w: Optional[float] = 100
         Параметр остановки алгоритма. Как только разница между результатами соседним итераций меньше чем данный параметр, алгоритм прекращает работу.
+
+    alpha: Optional[float] = 0.5
+        Степень влияния регуляризации. На этот коэфициент домножается регуляризация.
+
+    regularization: Optional[bool] = False
+        Флаг применения регуляризации. Принимает значения "True" или "False.
+
+    type: Optional[str] = 'linear'
+        Тип классификации: линейная или полиномиальная. Принимает значения 'linear' и 'poly'.
+
+    degree: Optional[int] = 1
+        Показатель степени полиномиальной регрессии.
+
     draw_flag: Optional[bool] = False
         Флаг рисования результатов работы модели. Принимает значения "True" или "False.
+
     """
 
     def __init__(self,
@@ -77,13 +100,13 @@ class RadicalRegression:
             self.omega = np.linalg.inv(self.X_train.T @ G @ self.X_train) @ self.X_train.T @ G @ u
             i += 1
 
-        r = ((self.X_test[:,1:]-np.mean(self.X_test[:,1:2]))**2)
-        rbf = np.exp(-(0.0001*r)**2)
+        r = ((self.X_test[:, 1:] - np.mean(self.X_test[:, 1:2])) ** 2)
+        rbf = np.exp(-(0.0001 * r) ** 2)
         z = self.omega[0] + rbf @ self.omega[1:]
         y_pred = 1 / (1 + np.exp(-z))
         mu = np.mean(y_pred.flatten())
         y_pred = np.array([1 if i[0] >= mu else 0 for i in y_pred]).reshape((-1, 1))
-        
+
         if self.draw_flag:
             draw(X_test_old, self.y_test, y_pred).show()
         return np.concatenate((self.X_test, y_pred), axis=1)
@@ -97,5 +120,5 @@ if __name__ == "__main__":
     y_train = y[:int(0.8 * 500), :]
     X_test = X[int(0.8 * 500):, :]
     y_test = y[int(0.8 * 500):, :]
-    pred = RadicalRegression(X_train, y_train, X_test,y_test, draw_flag=1, type='poly', degree = 2).solve()
+    pred = RadicalRegression(X_train, y_train, X_test, y_test, draw_flag=1, type='poly', degree=2).solve()
     print(pred, y_test)
