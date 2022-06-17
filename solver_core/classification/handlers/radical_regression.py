@@ -17,8 +17,6 @@ class RadicalRegression:
         Массив значений обучающих данных. Строго одномерный.
     X_test: np.ndarray
         Массив данных, на которых тестируется модель. Может быть одномерными и многомерными.
-    mu: Optional[float] = 0.5
-        Критерий, по которому отделяются классы в логистической регрессии.
     max_iter: Optional[int] = 500
         Максимальное количество итераций алгоритма.
     delta_w: Optional[float] = 100
@@ -44,7 +42,6 @@ class RadicalRegression:
         self.omega = np.zeros(X_train.shape[1] + 1)
         self.delta_w = delta_w
         self.max_iter = max_iter
-        self.mu = mu
         self.type = type
         self.degree = degree
 
@@ -75,9 +72,10 @@ class RadicalRegression:
             old_w = self.omega
             self.omega = np.linalg.inv(self.X_train.T @ G @ self.X_train) @ self.X_train.T @ G @ u
             i += 1
-        rbf_feature = RBFSampler(gamma=1,n_components=len(self.omega[1:]), random_state=1)
-        X_features = rbf_feature.fit_transform(self.X_test)
-        z = self.omega[0] + X_features @ self.omega[1:]
+        
+        r = ((X_test-1)**2)
+        rbf = np.exp(-(0.0001*r)**2)
+        z = self.omega[0] + rbf @ self.omega[1:]
         y_pred = 1 / (1 + np.exp(-z))
         mu = np.mean(y_pred.flatten())
         y_pred = np.array([1 if i[0] >= mu else 0 for i in y_pred]).reshape((-1, 1))

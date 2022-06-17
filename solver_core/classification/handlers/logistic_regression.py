@@ -21,9 +21,6 @@ class LogisticRegression:
     X_test: np.ndarray
         Массив данных, на которых тестируется модель. Может быть одномерными и многомерными.
 
-    mu: Optional[float] = 0.5
-        Критерий, по которому отделяются классы в логистической регрессии.
-
     max_iter: Optional[int] = 500
         Максимальное количество итераций алгоритма.
 
@@ -68,7 +65,6 @@ class LogisticRegression:
         self.delta_w = delta_w
         self.max_iter = max_iter
         self.alpha = alpha
-        self.mu = mu
         self.degree = degree
         self.type = type
 

@@ -2,9 +2,11 @@ def draw(X_test, y_test, y_pred):
     import numpy as np
     if X_test.shape[1] == 2:
         import plotly.graph_objects as go
+        print(X_test.shape, y_test.shape, y_pred.shape)
         X = np.concatenate((X_test, y_test, y_pred), axis=1)
         print(X)
         print(np.unique(X[:, 2]), np.unique(X[:, 3]))
+
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=X[(X[:, 2] == np.unique(X[:, 2])[0]) & (X[:, 3] == np.unique(X[:, 3])[0])][:, 0],
                                  y=X[(X[:, 2] == np.unique(X[:, 2])[0]) & (X[:, 3] == np.unique(X[:, 3])[0])][:, 1],
