@@ -1,9 +1,8 @@
 import numpy as np
 from typing import Optional
-from sklearn.kernel_approximation import RBFSampler
 from sklearn.preprocessing import PolynomialFeatures
 
-from .draw_classification import draw
+from draw_classification import draw
 
 
 class RadicalRegression:
@@ -105,7 +104,7 @@ class RadicalRegression:
             self.omega = np.linalg.inv(self.X_train.T @ G @ self.X_train) @ self.X_train.T @ G @ u
             i += 1
         r = ((self.X_test[:, 1:] - self.c) ** 2)
-        rbf = np.exp(-(0.0001 * r) ** 2)
+        rbf = np.exp(-(0.000001 * r) ** 2)
         z = self.omega[0] + rbf @ self.omega[1:]
         y_pred = 1 / (1 + np.exp(-z))
         mu = np.mean(y_pred.flatten())
@@ -124,5 +123,5 @@ if __name__ == "__main__":
     y_train = y[:int(0.8 * 500), :]
     X_test = X[int(0.8 * 500):, :]
     y_test = y[int(0.8 * 500):, :]
-    pred = RadicalRegression(X_train, y_train, X_test, y_test, draw_flag=1, type='poly', degree=2).solve()
+    pred = RadicalRegression(X_train, y_train, X_test, y_test, draw_flag=1, c = 0).solve()
     print(pred, y_test)

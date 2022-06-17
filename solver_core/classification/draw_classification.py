@@ -1,4 +1,4 @@
-def draw(X_test, y_test, y_pred):
+def draw(X_test, y_test, y_pred, legend = True):
     import numpy as np
     if X_test.shape[1] == 2:
         import plotly.graph_objects as go
@@ -47,7 +47,7 @@ def draw(X_test, y_test, y_pred):
             pass
         fig.update_layout(title="Результаты классификации на тестовой выборке", xaxis_title="X, у.е.",
                           yaxis_title="Y, у.е.")
-        fig.update_traces(showlegend=True)
+        fig.update_traces(showlegend=legend)
         return fig
     elif X_test.shape[1] == 3:
         import plotly.graph_objects as go
@@ -100,7 +100,7 @@ def draw(X_test, y_test, y_pred):
             pass
         fig.update_layout(title="Результаты классификации на тестовой выборке", xaxis_title="X, у.е.",
                           yaxis_title="Y, у.е.")
-        fig.update_traces(showlegend=True)
+        fig.update_traces(showlegend=legend)
 
         return fig
     else:
