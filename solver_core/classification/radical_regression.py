@@ -42,6 +42,9 @@ class RadicalRegression:
     degree: Optional[int] = 1
         Показатель степени полиномиальной регрессии.
 
+    c: Optional[float] = 0,
+        Точка, до которой расчитывается норма в РБФ.
+
     draw_flag: Optional[bool] = False
         Флаг рисования результатов работы модели. Принимает значения "True" или "False.
 
@@ -56,6 +59,7 @@ class RadicalRegression:
                  max_iter: Optional[int] = 500,
                  type: Optional[str] = 'linear',
                  degree: Optional[int] = 1,
+                 c: Optional[float] = 0,
                  draw_flag: Optional[bool] = False):
         self.X_train = X_train
         self.y_train = y_train
@@ -66,6 +70,7 @@ class RadicalRegression:
         self.delta_w = delta_w
         self.max_iter = max_iter
         self.type = type
+        self.c = c
         self.degree = degree
 
     def solve(self):
@@ -99,8 +104,7 @@ class RadicalRegression:
             old_w = self.omega
             self.omega = np.linalg.inv(self.X_train.T @ G @ self.X_train) @ self.X_train.T @ G @ u
             i += 1
-
-        r = ((self.X_test[:, 1:] - np.mean(self.X_test[:, 1:2])) ** 2)
+        r = ((self.X_test[:, 1:] - self.с) ** 2)
         rbf = np.exp(-(0.0001 * r) ** 2)
         z = self.omega[0] + rbf @ self.omega[1:]
         y_pred = 1 / (1 + np.exp(-z))
