@@ -3,7 +3,7 @@ from typing import Optional
 
 from sklearn.preprocessing import PolynomialFeatures
 
-from .draw_classification import draw
+from draw_classification import draw
 
 
 class LogisticRegression:
@@ -81,7 +81,7 @@ class LogisticRegression:
         if self.type != 'linear':
             poly = PolynomialFeatures(degree=self.degree)
             self.X_train = poly.fit_transform(self.X_train)
-        self.X_train = np.concatenate((np.ones_like(X_train[:, 0:1]), X_train), axis=1)
+        self.X_train = np.concatenate((np.ones_like(self.X_train[:, 0:1]), self.X_train), axis=1)
         self.omega = np.linalg.inv(self.X_train.T @ self.X_train) @ self.X_train.T @ self.y_train
         i = 0
         old_w = np.array([-(10 ** 3)] * len(self.omega))
