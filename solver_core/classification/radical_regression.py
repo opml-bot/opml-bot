@@ -1,10 +1,9 @@
-
 import numpy as np
 from typing import Optional
 from sklearn.kernel_approximation import RBFSampler
 from sklearn.preprocessing import PolynomialFeatures
 
-from solver_core.classification.handlers.draw_classification import draw
+from .draw_classification import draw
 
 class RadicalRegression:
     """
