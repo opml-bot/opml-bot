@@ -1,5 +1,7 @@
 import numpy as np
 from typing import Optional
+
+from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 
 from .draw_classification import draw
@@ -42,7 +44,7 @@ class SVM:
                  y_train: np.ndarray,
                  X_test: np.ndarray,
                  y_test: np.ndarray,
-                 max_iter: Optional[int] = 500,
+                 max_iter: Optional[int] = -1,
                  kernel: Optional[str] = 'linear',
                  degree: Optional[int] = 2,
                  draw_flag: Optional[bool] = False):
@@ -93,8 +95,8 @@ class SVM:
                             print(self.omega,b_opt)
         print(self.X_test.shape,self.omega.shape)
         y_pred = np.sign(self.X_test@self.omega.T + b_opt)'''
-
         model = SVC(kernel=self.kernel, degree=self.degree, max_iter=self.max_iter)
+        self.X_train = StandardScaler(self.X_train)
         model.fit(self.X_train, self.y_train)
         y_pred = model.predict(self.X_test).T.reshape(-1, 1)
         if self.draw_flag:
