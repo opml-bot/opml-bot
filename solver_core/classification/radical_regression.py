@@ -37,7 +37,7 @@ class RadicalRegression:
     regularization: Optional[bool] = False
         Флаг применения регуляризации. Принимает значения "True" или "False.
 
-    type: Optional[str] = 'linear'
+    type_cl: Optional[str] = 'linear'
         Тип классификации: линейная или полиномиальная. Принимает значения 'linear' и 'poly'.
 
     degree: Optional[int] = 1
@@ -58,7 +58,7 @@ class RadicalRegression:
                  y_test: np.ndarray,
                  delta_w: Optional[float] = 100,
                  max_iter: Optional[int] = 500,
-                 type: Optional[str] = 'linear',
+                 type_cl: Optional[str] = 'linear',
                  degree: Optional[int] = 1,
                  c: Optional[float] = None,
                  draw_flag: Optional[bool] = False):
@@ -70,7 +70,7 @@ class RadicalRegression:
         self.omega = np.zeros(X_train.shape[1] + 1)
         self.delta_w = delta_w
         self.max_iter = max_iter
-        self.type = type
+        self.type_cl = type_cl
         self.c = c
         self.degree = degree
 
@@ -86,7 +86,7 @@ class RadicalRegression:
             Коэфициенты регрессии w.
         """
         X_test_old = self.X_test
-        if self.type != 'linear':
+        if self.type_cl != 'linear':
             poly = PolynomialFeatures(degree=self.degree)
             self.X_train = poly.fit_transform(self.X_train)
             self.X_test = poly.fit_transform(self.X_test)

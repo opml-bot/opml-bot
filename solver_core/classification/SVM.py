@@ -28,7 +28,7 @@ class SVM:
     max_iter: Optional[int] = 500
         Максимальное количество итераций алгоритма.
 
-    type: Optional[str] = 'linear'
+    kernel: Optional[str] = 'linear'
         Тип классификации: линейная или полиномиальная. Принимает значения 'linear' и 'poly'.
 
     degree: Optional[int] = 1
