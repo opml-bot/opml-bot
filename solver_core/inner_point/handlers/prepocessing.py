@@ -22,7 +22,11 @@ except ImportError:
 
 
 # preprocessing
-def prepare_all(function: str, restriction: str, method: str, started_point: Optional[str] = None) -> tuple:
+def prepare_all(function: str,
+                restriction: str,
+                method: str,
+                started_point: Optional[str] = None,
+                ds: Optional[float] = 1.) -> tuple:
     """
     Функция подготавливает входные данные. В случае некорректного формата или математически неправильных записей будет
     вызвана ошибка.
@@ -116,7 +120,7 @@ def prepare_all(function: str, restriction: str, method: str, started_point: Opt
             restr = rewrited_restrs
         for i in range(5):
             try:
-                point = FirstPhase(n_vars, restr).solve()
+                point = FirstPhase(n_vars, restr, ds=ds).solve()
             except np.linalg.LinAlgError as e:
 
                 print(f'{i+1} попытка найти начальную точку провалилась, попробуем запустить новую итерацию.')

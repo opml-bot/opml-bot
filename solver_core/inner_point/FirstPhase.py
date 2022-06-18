@@ -27,11 +27,13 @@ class FirstPhase:
     def __init__(self,
                  n: int,
                  restrictions: list,
-                 eps: Optional[float] = 1e-12):
+                 eps: Optional[float] = 1e-12,
+                 ds: Optional[float] = 1.):
 
         self.x = np.random.random(n)
         self.restrictions = restrictions
-        self.s = max([i(self.x) for i in self.restrictions]) + 1
+        self.ds = ds
+        self.s = max([i(self.x) for i in self.restrictions]) + self.ds
         self.eps = eps
         self.mu = 1
 
@@ -39,7 +41,7 @@ class FirstPhase:
     def solve(self):
 
         for i in self.restrictions:
-            if i(self.x) > 0:
+            if i(self.x) >= 0:
                 break
         else:
             return self.x
@@ -47,7 +49,12 @@ class FirstPhase:
         l_grad = grad(self.lagrange)
         step = np.linalg.inv(l_hess(self.x)) @ l_grad(self.x)
 
-        while self.s - 1. > 0:
+        while self.s-self.ds > 0:
+            # t = []
+            # for i in self.restrictions:
+            #     t.append(i(self.x))
+            # t = np.array(t)
+            # print("s=", self.s, (t<0).all())
             if np.isnan(self.x).any():
                 raise ValueError('В ходе работы получился None.')
             self.x = self.x - step
@@ -60,11 +67,12 @@ class FirstPhase:
                     if i(self.x) > 0:
                         break
                 else:
-                    return np.round(self.x, 5)
+                    return self.x
             # -------------------------------------------------------
-            self.s = max([i(self.x) for i in self.restrictions]) + 1
+            self.s = max([i(self.x) for i in self.restrictions]) + self.ds
             self.mu += 1
-        return np.round(self.x, 5)
+
+        return self.x
 
     def lagrange(self, x):
         l = self.s*self.mu

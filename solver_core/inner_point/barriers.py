@@ -7,8 +7,6 @@ from numpy.linalg import norm
 # from ..handlers.input_validation import check_expression, check_restr, check_point
 # from ..handlers.prepocessing import prepare_all
 
-# from solver_core.inner_point.handlers.input_validation import *
-# from solver_core.inner_point.handlers.prepocessing import prepare_all
 
 class LogBarrirers:
     """
@@ -69,11 +67,21 @@ class LogBarrirers:
     def lagrange(self, x):
         l = self.function(x)*self.mu
         for i in self.restrictions:
-            l -= npa.log(-i(x))
+            c = i(x)._value
+            if type(c) == npa.numpy_boxes.ArrayBox:
+                c = c._value
+            if c == 0:
+                c = np.inf
+                print(c)
+            l -= npa.log(c)
         return l
 
 
 if __name__ == '__main__':
+
+    from solver_core.inner_point.handlers.input_validation import *
+    from solver_core.inner_point.handlers.prepocessing import prepare_all
+
     # f = 'x1**2 + x2**2 + (0.5*1*x1 + 0.5*2*x2)**2 + (0.5*1*x1 + 0.5*2*x2)**4'
     # subject_to = 'x1+x2<=0;2*x1-3*x2<=1'
     # zakharov_point_min = np.array([0, 0])
@@ -84,19 +92,19 @@ if __name__ == '__main__':
     f = '3*x1 + 5*x2'
     subject_to = 'x1<=3; 2*x2<=12; 3*x1+2*x2<=18; x1>=0; x2>=0'
     zakharov_point_min = (2, 6)
-    # zakharov_point_start = '2; 6'
-    zakharov_point_start = ''
+    zakharov_point_start = '2; 6'
+    # zakharov_point_start = ''
 
-    f = "-2*x1-x2"
-    subject_to = "-1*x1-0.1*x2<=-1; -1*x1+0.6*x2<=-1; -0.2*x1+1.5*x2<=-0.2; 0.7*x1+0.7*x2<=0.7; 2*x1-0.2*x2<=2; 0.5*x1-1*x2<=0.5; -1*x1-1.5*x2<=-1"
-    zakharov_point_min = (4.7, 3.5)
-    zakharov_point_start = ''
+    # f = "-2*x1-x2"
+    # subject_to = "-1*x1-0.1*x2<=-1; -1*x1+0.6*x2<=-1; -0.2*x1+1.5*x2<=-0.2; 0.7*x1+0.7*x2<=0.7; 2*x1-0.2*x2<=2; 0.5*x1-1*x2<=0.5; -1*x1-1.5*x2<=-1"
+    # zakharov_point_min = (4.7, 3.5)
+    # zakharov_point_start = ''
     # input_validation
     f = check_expression(f)
     subject_to = check_restr(subject_to, method='log_barrier')
     zakharov_point_start = check_point(zakharov_point_start, f, subject_to, 'log_barrier')
     # preprocessing
-    f, subject_to, zakharov_point_start = prepare_all(f, subject_to, 'log_barrier', zakharov_point_start)
+    f, subject_to, zakharov_point_start = prepare_all(f, subject_to, 'log_barrier', zakharov_point_start, ds=2)
     # solver
     print(zakharov_point_start)
     for i in subject_to:
