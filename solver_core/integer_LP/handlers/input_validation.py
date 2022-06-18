@@ -103,11 +103,13 @@ def check_restr(restr_str: str, method: str, splitter: Optional[str] = ';') -> s
             left, right = g[i].split(splitt)
             left, right = sympify(check_expression(left.strip())), sympify(check_expression(right.strip()))
             left -= right
+            d = dict(zip(list(left.free_symbols), [0]*len(left.free_symbols)))
+            b = float(left.subs(d))
             strleft = f'{left}'
             for i in left.free_symbols:
                 str_x = f'{i}'
                 strleft = strleft.replace(str_x, str_x[:1] + '_' + str_x[1:])
-            ans.append(strleft + f' {splitt.strip()} 0')
+            ans.append(strleft + f' {splitt.strip()} {b}')
     restrs = ";".join(ans)
     return restrs
 
