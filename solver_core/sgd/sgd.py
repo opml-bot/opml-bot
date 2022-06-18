@@ -15,24 +15,32 @@ import matplotlib.pyplot as plt
 
 from solver_core.sgd.utils import *
 
-def sgd(function,restrictions,type_f = 'max', m = 10, eps = 0.01,max_iter = 1000,eta = 0.01):
+def stochatic_gradient_descent(function,restrictions, m = 10, eps = 0.01,max_iter = 1000,eta = 0.01):
   '''
-  Решение задачи оптимизации методом имитации отжига
+  Решение задачи оптимизации методом стохастического градиентного спуска
   Parameters
   ----------
   function: str
       Функция в аналитическом виде
   restrictions: list
       Список ограничений
-  type_f: str
-      Максимум или минимум
+  m: int
+      Размер выборки
+  eps: int
+      Точность алгоритма
+  max_iter: int
+      Максимальное количество итераций
+  eta: int
+      Коэффициент шага
 
   Returns
   -------
-  x_current: list
+  sample_x[pos]: list
       Точка оптимума
-  E_current: int
+  f_x[pos]: int
       Значение функции в точки оптимума
+  w_sample: list
+      Значение весов
   '''
 
 
@@ -107,5 +115,5 @@ def sgd(function,restrictions,type_f = 'max', m = 10, eps = 0.01,max_iter = 1000
 if __name__ == '__main__':
     objective_function = '8x_1 + 6x_2'
     constraints = ['2x_1 + 5x_2 <= 19', '4x_1 + 1x_2 <= 16']
-    x,f,w = sgd(objective_function,constraints)
+    x,f,w = stochatic_gradient_descent(objective_function,constraints)
     print(x,f,w)
