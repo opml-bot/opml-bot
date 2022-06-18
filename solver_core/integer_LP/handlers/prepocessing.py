@@ -58,6 +58,7 @@ def prepare_all(function: str,
             restr.append(left)
         return [func, opt_type] , restr
     if method == "gomori":
+        vars = set()
         for i in restriction:
             if i.find('>=') != -1:
                 spliter = '>='
