@@ -8,7 +8,7 @@ Original file is located at
 """
 
 from typing import Optional
-
+from .drawing.draw_func import draw
 import numpy as np
 from sklearn import linear_model
 import statsmodels.api as sm
@@ -32,12 +32,14 @@ class LinearRegression:
                  X: np.ndarray,
                  y: np.ndarray,
                  regularization: Optional[str] = None,
-                 alpha: Optional[int] = 10):
+                 alpha: Optional[int] = 10,
+                 draw_flag: Optional[bool] = False):
 
         self.x_points = X
         self.y_points = y
         self.regularization = regularization
         self.alpha = alpha
+        self.draw_flag = draw_flag
 
         # omega - искомые коэфициенты. Здесь задаются начальные значения
         if len(self.x_points.shape) == 1:
@@ -90,16 +92,12 @@ class LinearRegression:
             model = sm.OLS(pred, self.X)
             results = model.fit()
             self.omega = results.params
-            
-        # подготовка ответа
-        func = f'{self.omega[0]:.4f} + {self.omega[1]:.4f}*x1'
-        if len(self.omega > 2):
-            for i in range(1, len(self.omega) - 1):
-                func += f' {self.omega[i+1]:+.4f}*x{i+1}'
-        func += ')'
-        
+        self.omega = self.omega.flatten()
+        func = f'y = {self.omega[0]:.3f} + {self.omega[1]:.3f} * x' if self.omega[1] >= 0 else f'y = {self.omega[0]:.3f} - {abs(self.omega[1]):.3f} * x'
         koefs = self.omega[1:]
         free_member = self.omega[0]
+        if self.draw_flag:
+            draw(self, 2)
         return func, koefs, free_member
 
     def predict(self, x):
