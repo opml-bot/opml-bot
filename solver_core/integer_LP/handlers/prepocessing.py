@@ -81,8 +81,8 @@ def prepare_all(function: str,
                 if left.subs(d) == 0:
                     print('SIMPLE')
                     to_remove.append(i)
-            for i in to_remove:
-                restriction.remove(i)
+        for i in to_remove:
+            restriction.remove(i)
         func = sympify(function)
         strfunc = f'{func}'
         for i in func.free_symbols:
