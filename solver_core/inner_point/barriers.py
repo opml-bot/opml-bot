@@ -50,8 +50,7 @@ class LogBarrirers:
         step = np.linalg.inv(l_hess(self.x)) @ l_grad(self.x)
 
         while not np.allclose(step, np.zeros(self.x.shape)):
-            print('-----------------------ITER------------------------------------')
-            print(self.x)
+
             self.x = self.x - step
             try:
                 step = np.linalg.inv(l_hess(self.x)) @ l_grad(self.x)
