@@ -101,7 +101,7 @@ class SVM:
         model.fit(self.X_train, self.y_train.reshape(-1, 1))
         y_pred = model.predict(self.X_test).T.reshape(-1, 1)
         if self.draw_flag:
-            draw(self.X_test, self.y_test, y_pred).show()
+            draw(self.X_test, self.y_test, y_pred).to_html()
         return np.concatenate((self.X_test, y_pred), axis=1)
 
 

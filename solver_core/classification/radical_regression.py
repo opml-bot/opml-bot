@@ -116,7 +116,7 @@ class RadicalRegression:
         y_pred = np.array([1 if i[0] >= mu else 0 for i in y_pred]).reshape((-1, 1))
 
         if self.draw_flag:
-            draw(X_test_old, self.y_test, y_pred).show()
+            draw(X_test_old, self.y_test, y_pred).to_html()
         return np.concatenate((self.X_test, y_pred), axis=1)
 
 
