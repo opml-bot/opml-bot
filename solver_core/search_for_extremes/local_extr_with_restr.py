@@ -3,7 +3,8 @@ import numpy as np
 import pandas as pd
 from IPython.display import display, Latex
 
-from .drawing_func import *
+from solver_core.search_for_extremes.drawing_func import *
+
 
 
 class LocalExtrWithRestrictions:
