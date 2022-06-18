@@ -110,7 +110,7 @@ def check_restr(restr_str: str, method: str, splitter: Optional[str] = ';') -> s
             for i in left.free_symbols:
                 str_x = f'{i}'
                 strleft = strleft.replace(str_x, str_x[:1] + '_' + str_x[1:])
-            ans.append(strleft + f' {splitt.strip()} {-b}')
+            ans.append(strleft + f' {splitt.strip()} {int(b)}')
     restrs = ";".join(ans)
     return restrs
 
