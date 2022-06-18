@@ -153,6 +153,7 @@ def rewrite(restr: Callable) -> Callable:
     new = lambda x: -r(x)
     return new
 
+
 def to_callable(expression: sympy.core) -> Callable:
     """
     Преобразует исходное выражение в функцию питона.
