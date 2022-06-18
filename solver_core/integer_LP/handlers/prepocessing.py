@@ -73,9 +73,13 @@ def prepare_all(function: str,
             left, right = sympify(left), sympify(right)
             left -= right
             vars_ |= set(left.free_symbols)
+            print('--RESTR--')
+            print(i)
             if len(left.free_symbols) == 1:
+                print('ODD')
                 d = dict(zip(list(left.free_symbols), [0]))
                 if left.subs(d) == 0:
+                    print('SIMPLE')
                     to_remove.append(i)
             for i in to_remove:
                 restriction.remove(i)
