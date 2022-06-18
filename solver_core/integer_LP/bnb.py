@@ -112,8 +112,8 @@ class BNB:
 
 
 if __name__ == "__main__":
-    from solver_core.ILP.handlers.input_validation import *
-    from solver_core.ILP.handlers.prepocessing import prepare_all
+    from solver_core.integer_LP.handlers.input_validation import *
+    from solver_core.integer_LP.handlers.prepocessing import prepare_all
     f = '3*x1+5*x2'
     subject_to = '5*x1+2*x2<=14; 2*x1+5*x2<=16;x1>=0; x2>=0'
 

@@ -12,7 +12,7 @@ from warnings import warn
 import copy
 import pandas as pd
 
-from solver_core.gomori.utils import *
+from solver_core.integer_LP.utils import *
 
 def gomory_solve(num_vars: int, constraints: list, objective_function: tuple):
     """
