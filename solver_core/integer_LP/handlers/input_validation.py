@@ -105,7 +105,7 @@ def check_restr(restr_str: str, method: str, splitter: Optional[str] = ';') -> s
             left -= right
             d = dict(zip(list(left.free_symbols), [0]*len(left.free_symbols)))
             b = float(left.subs(d))
-            left += b
+            left -= b
             strleft = f'{left}'
             for i in left.free_symbols:
                 str_x = f'{i}'
