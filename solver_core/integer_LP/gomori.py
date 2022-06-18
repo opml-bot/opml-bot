@@ -12,7 +12,10 @@ from warnings import warn
 import copy
 import pandas as pd
 
-from solver_core.integer_LP.utils import *
+if __name__ == "__main__":
+    from solver_core.integer_LP.utils import *
+else:
+    from utils import *
 
 def gomory_solve(num_vars: int, constraints: list, objective_function: tuple):
     """
