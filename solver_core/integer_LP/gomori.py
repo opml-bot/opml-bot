@@ -15,7 +15,7 @@ import pandas as pd
 if __name__ == "__main__":
     from solver_core.integer_LP.utils import *
 else:
-    from utils import *
+    from .utils import *
 
 def gomory_solve(num_vars: int, constraints: list, objective_function: tuple):
     """
