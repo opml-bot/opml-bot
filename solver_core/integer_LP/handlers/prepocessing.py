@@ -10,7 +10,8 @@ from copy import deepcopy
 # preprocessing
 def prepare_all(function: str,
                 restriction: str,
-                method: str) -> tuple:
+                method: str,
+                opt_type: str) -> tuple:
     """
     Функция подготавливает входные данные. В случае некорректного формата или математически неправильных записей будет
     вызвана ошибка.
@@ -55,9 +56,27 @@ def prepare_all(function: str,
             vars_ |= set(left.free_symbols)
             left = to_callable(left)
             restr.append(left)
-
-    return func, restr
-
+        return [func, opt_type] , restr
+    if method == "gomori":
+        for i in restriction:
+            if i.find('>=') != -1:
+                spliter = '>='
+            elif i.find('<=') != -1:
+                spliter = '<='
+            elif i.find('=') != -1:
+                spliter = '='
+            left, right = i.split(spliter)
+            left = left.strip()
+            right = right.strip()
+            left, right = sympify(left), sympify(right)
+            left -= right
+            vars_ |= set(left.free_symbols)
+        func = sympify(function)
+        strfunc = f'{func}'
+        for i in func.free_symbols:
+            str_x = f'{i}'
+            strfunc = strfunc.replace(str_x, str_x[:1] + '_' + str_x[1:])
+        return len(vars_), restriction, (strfunc, opt_type)
 
 def to_callable(expression: sympy.core) -> Callable:
     """

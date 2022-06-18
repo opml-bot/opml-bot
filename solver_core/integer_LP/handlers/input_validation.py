@@ -91,7 +91,23 @@ def check_restr(restr_str: str, method: str, splitter: Optional[str] = ';') -> s
                  не поддерживаются, можем добавить.''')
                 # if g[i].count('=') != 1:
                 #     raise ValueError(f'Неправильно задано ограничение {g[i]}')
-
+        if method == 'gomori':
+            if g[i].count('=') > 1:
+                raise ValueError(f'Неправильно задано ограничение {g[i]}')
+            if g[i].find('>=') != -1:
+                splitt = '>='
+            elif g[i].find('<=') != -1:
+                splitt = '<='
+            elif g[i].find('=') != -1:
+                splitt = '='
+            left, right = g[i].split(splitt)
+            left, right = sympify(check_expression(left.strip())), sympify(check_expression(right.strip()))
+            left -= right
+            strleft = f'{left}'
+            for i in left.free_symbols:
+                str_x = f'{i}'
+                strleft = strleft.replace(str_x, str_x[:1] + '_' + str_x[1:])
+            ans.append(strleft + f' {splitt.strip()} 0')
     restrs = ";".join(ans)
     return restrs
 
@@ -99,7 +115,7 @@ def check_restr(restr_str: str, method: str, splitter: Optional[str] = ';') -> s
 if __name__ == '__main__':
     func = 'x1**2 - x3'
     restr = 'x2 - x4 >= 3'
-    meth = 'log_barrier'
+    meth = 'gomori'
     start = '0;4;0;0'
 
     # костяк проверок

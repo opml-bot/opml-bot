@@ -16,9 +16,12 @@ class BNB:
 
     """
     def __init__(self,
-                function: Callable,
+                function: tuple,
                 restrictions: list):
-        self.f = function
+        if function[1] == "min":
+            self.f = lambda x: -function[0](x)
+        else:
+            self.f = function[0]
         self.restr = restrictions
         i = 0
         while True:
