@@ -86,7 +86,7 @@ def prepare_all(function: str,
             strfunc = strfunc.replace(str_x, str_x[:1] + '_' + str_x[1:])
         strfunc = strfunc.replace('*', '')
         restriction = [i.replace('*', '').replace(' x', ' 1x') for i in restriction]
-        return len(vars_), restriction, (strfunc, opt_type)
+        return len(vars_), restriction, (opt_type, strfunc)
 
 def to_callable(expression: sympy.core) -> Callable:
     """
