@@ -59,6 +59,7 @@ def prepare_all(function: str,
         return [func, opt_type] , restr
     if method == "gomori":
         vars_ = set()
+        to_remove = []
         for i in restriction:
             if i.find('>=') != -1:
                 spliter = '>='
@@ -72,12 +73,17 @@ def prepare_all(function: str,
             left, right = sympify(left), sympify(right)
             left -= right
             vars_ |= set(left.free_symbols)
+            if len(left.free_symbols) == 1:
+                d = dict(zip(list(left.free_symbols), [0]))
+                if left.subs(d) == 0:
+                    to_remove.append(i)
+            for i in to_remove:
+                restriction.remove(i)
         func = sympify(function)
         strfunc = f'{func}'
         for i in func.free_symbols:
             str_x = f'{i}'
             strfunc = strfunc.replace(str_x, str_x[:1] + '_' + str_x[1:])
-        print(vars_)
         return len(vars_), restriction, (strfunc, opt_type)
 
 def to_callable(expression: sympy.core) -> Callable:
