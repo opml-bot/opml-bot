@@ -3,8 +3,8 @@ import numpy as np
 from sympy import *
 import math
 import random
-import matplotlib.pyplot as plt
 
+from solver_core.stochastic_LP.handlers.utils_sgd import *
 
 def stochatic_gradient_descent(function,restrictions, m = 10, eps = 0.01,max_iter = 1000,eta = 0.01):
   '''
@@ -104,8 +104,6 @@ def stochatic_gradient_descent(function,restrictions, m = 10, eps = 0.01,max_ite
   return sample_x[pos], f_x[pos],w_sample
 
 if __name__ == '__main__':
-
-    from solver_core.stochastic_LP.handlers.utils_sgd import *
 
     objective_function = '8x_1 + 6x_2'
     constraints = ['2x_1 + 5x_2 <= 19', '4x_1 + 1x_2 <= 16']
