@@ -4,7 +4,91 @@ from sympy import *
 import math
 import random
 
-from solver_core.stochastic_LP.handlers.utils_sgd import *
+
+def restrict_SGD(restrictions: list, func: str):
+  """
+  Переписывает ограничения для решения задачи.
+  Parameters
+  ----------
+  restrictions: list
+      Ограничения
+  function: str
+      Функция
+
+  Returns
+  -------
+  A: np.array
+      Массив значений для ограничений
+  B: np.array
+      Массив ограничений
+  C: np.array
+      Массив значений функции
+  sign:
+      Знак
+
+
+  """
+  sign = []
+  C = []
+  for i in func.split('x')[:-1]:
+    C.append(int(i.split()[-1]))
+  C = np.array(C, dtype=np.float)
+
+  A = []
+  B = []
+
+  for i in restrictions:
+    function = str(i)
+
+    if function.find('<=') != -1:
+      sign.append('le')
+      left, right = function.split('<=')
+      B.append(int(right))
+      a1 = []
+      for i in left.split('x')[:-1]:
+        a1.append(int(i.split()[-1]))
+      A.append(a1)
+
+    elif function.find('>=') != -1:
+      sign.append('me')
+      left, right = function.split('>=')
+      B.append(int(right))
+      a1 = []
+      for i in left.split('x')[:-1]:
+        a1.append(int(i.split()[-1]))
+      A.append(a1)
+
+    elif function.find('>') != -1:
+      sign.append('m')
+      left, right = function.split('>')
+      B.append(int(right))
+      a1 = []
+      for i in left.split('x')[:-1]:
+        a1.append(int(i.split()[-1]))
+      A.append(a1)
+
+    elif function.find('<') != -1:
+      sign.append('l')
+      left, right = function.split('<')
+      B.append(int(right))
+      a1 = []
+      for i in left.split('x')[:-1]:
+        a1.append(int(i.split()[-1]))
+      A.append(a1)
+
+    elif function.find('=') != -1:
+      sign.append('e')
+      left, right = function.split('=')
+      B.append(int(right))
+      a1 = []
+      for i in left.split('x')[:-1]:
+        a1.append(int(i.split()[-1]))
+      A.append(a1)
+  A = np.array(A, dtype=np.float)
+  B = np.array(B, dtype=np.float)
+
+  return A, B, C, sign
+
 
 def stochatic_gradient_descent(function,restrictions, m = 10, eps = 0.01,max_iter = 1000,eta = 0.01):
   '''
@@ -35,7 +119,7 @@ def stochatic_gradient_descent(function,restrictions, m = 10, eps = 0.01,max_ite
   '''
 
 
-  coeffs, coef_rest, coef_f, signs = restrict(restrictions,function)
+  coeffs, coef_rest, coef_f, signs = restrict_SGD(restrictions,function)
 
   sample_x = []
 
