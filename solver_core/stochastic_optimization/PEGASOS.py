@@ -21,6 +21,7 @@ class Pegasos:
         Массив признаков.
     y: np.ndarray
         Массив правильных меток для признаков.
+        
     reg: Optional[float] = 1
         Параметр регуляризации.
     T: Optional[int] = 500
@@ -30,10 +31,12 @@ class Pegasos:
     def __init__(self,
                  X: np.ndarray,
                  y: np.ndarray,
+                 Xtest: np.ndarray,
                  reg: Optional[float] = 1,
                  T: Optional[int] = 500):
         self.X = X
         self.y = y.flatten()
+        self.Xtest = Xtest
         self.lam = reg
         self.n_iter = T
         self.w = np.zeros(self.X.shape[1])
@@ -54,7 +57,7 @@ class Pegasos:
                 self.w = (1 - nu*self.lam)*self.w + nu*c*xk
             else:
                 self.w = (1 - nu * self.lam)*self.w
-        predict = [1 if np.sum(self.w*i) > 0 else -1 for i in self.X]
+        predict = [1 if np.sum(self.w*i) > 0 else -1 for i in self.Xtest]
         acc = np.where(predict != self.y, 0, 1).sum()/self.y.shape[0]
         print(acc)
         return self.y, predict, self.w
@@ -73,6 +76,6 @@ if __name__ == "__main__":
     df['Y'] = y
     df.to_csv('data.csv', index=False)
 
-    X, y, xest, ytest = prepare_data('data.csv')
-    task = Pegasos(X, y, T=10**6)
+    X, y, Xtest, ytest = prepare_data('data.csv')
+    task = Pegasos(X, y,Xtest, T=10**6)
     ans = task.solve()
