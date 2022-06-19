@@ -5,7 +5,7 @@ import random
 import plotly.express as px
 import pandas as pd
 
-from solver_core.annealing_method.utils import *
+from solver_core.stochastic_LP.handlers.utils_annealing import *
 from solver_core.search_for_extremes.drawing_func import *
 
 
