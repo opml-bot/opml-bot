@@ -100,3 +100,4 @@ class Update(NamedTuple):
     ONEDIMOPT_MAX_ITER = "UPDATE onedimopt SET max_iter = ? WHERE user_id = ?"
     ONEDIMOPT_PRINT_INTERIM = "UPDATE onedimopt SET print_interim = ? WHERE user_id = ?"
 
+
