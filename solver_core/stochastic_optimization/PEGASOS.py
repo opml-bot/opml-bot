@@ -55,7 +55,7 @@ class Pegasos:
             else:
                 self.w = (1 - nu * self.lam)*self.w
         predict = [1 if np.sum(self.w*i) > 0 else -1 for i in self.X]
-        acc = np.where(predict != self.y, 0, 1).sum()/y.shape[0]
+        acc = np.where(predict != self.y, 0, 1).sum()/self.y.shape[0]
         print(acc)
         return self.y, predict, self.w
 
