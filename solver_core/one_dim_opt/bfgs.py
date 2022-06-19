@@ -21,7 +21,7 @@ class BFGS:
         Максимальное значение аргумента функции
     acc: Optional[float] = 1e-8
         Порог выхода по длине интервала поиска
-    max_iteration: Optional[float] = 500,
+    max_iter: Optional[float] = 500,
         Максимально допустимое количество итераций. По умолчанию 500.
     print_interim: Optional[bool] = False
         Флаг, нужно ли сохранять информацию об итерациях. Информация записывается в
@@ -38,7 +38,7 @@ class BFGS:
                  c2: float = 0.99,
                  max_arg: float = 100,
                  acc: float = 1e-8,
-                 max_iteration: float = 500,
+                 max_iter: float = 500,
                  print_interim: bool = False,
                  save_iters_df: bool = False):
         self.func = func
@@ -47,7 +47,7 @@ class BFGS:
         self.c2 = c2
         self.max_arg = max_arg
         self.acc = acc
-        self.max_iteration = max_iteration
+        self.max_iteration = max_iter
         self.print_interim = print_interim
         self.save_iters_df = save_iters_df
 
@@ -214,6 +214,6 @@ if __name__ == '__main__':
     # for j in range(3):
     #     x_solve = BFGS(funcs[j], 0, max_iteration=100, acc=10 ** -5, save_iters_df=True)
     #     c = x_solve.solve()
-    c = BFGS(func1, 0, max_iteration=100, acc=10 ** -5, save_iters_df=True).solve()
+    c = BFGS(func1, 0, acc=10 ** -5, max_iter=100, save_iters_df=True).solve()
     print(c)
 

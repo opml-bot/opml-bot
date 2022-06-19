@@ -1,6 +1,7 @@
 from vk_api.vk_api import VkApiMethod
 
 from vk_bot.answerer.message_handlers import Handlers
+from vk_bot.answerer.one_dim_opt.onedimopt_manager import OneDimOptManager
 from vk_bot.answerer.response_init import Response
 from vk_bot.answerer.search_for_extremes.extremum_manager import ExtremumManager
 from vk_bot.database import BotDatabase
@@ -64,8 +65,7 @@ class TaskManager:
                 return ExtremumManager(self.vk_api_method, self.db, self.user).manage(text)
             if text == 'Одномерная оптимизация':
                 self.user.update_status('onedimopt')
-                # TODO: дополнить после создания модуля OneDimOptManager
-                pass
+                return OneDimOptManager(self.vk_api_method, self.db, self.user).manage(text)
             if text == 'Обо мне':
                 return self.handlers.about_me()
             return self.handlers.click_button()
@@ -74,5 +74,4 @@ class TaskManager:
             return ExtremumManager(self.vk_api_method, self.db, self.user).manage(text)
 
         if self.status == 'onedimopt':
-            # TODO: дополнить после создания модуля OneDimOptManager
-            pass
+            return OneDimOptManager(self.vk_api_method, self.db, self.user).manage(text)

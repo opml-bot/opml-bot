@@ -40,18 +40,29 @@ class OneDimOpt:
 
         return self.db.select(Select.ONEDIMOPT_TYPE, (self.user_id,))[0]
 
-    def get_params(self) -> str:
+    def get_params(self) -> dict:
         """
         Извлечение всех внесенных данных для передачи их в реализацию алгоритма.
 
         Returns
         -------
-        str
+        dict
             Все данные, необходимые для решения задачи.
         """
 
-        # TODO: написать реализацию метода
-        pass
+        all_params = self.db.select(Select.ONEDIMOPT_ALL, (self.user_id,))
+        params = {
+            'func': all_params[3],
+            'interval_x': all_params[4],
+            'x0': all_params[5],
+            'c1': all_params[6],
+            'c2': all_params[7],
+            'max_arg': all_params[8],
+            'acc': all_params[9],
+            'max_iter': all_params[10],
+            'print_interim': all_params[11]
+        }
+        return params
 
     def update_step(self, step: str):
         """
@@ -100,6 +111,18 @@ class OneDimOpt:
         """
 
         self.db.update(Update.ONEDIMOPT_INTERVAL_X, (interval_x, self.user_id))
+
+    def update_x0(self, x0: float):
+        self.db.update(Update.ONEDIMOPT_X0, (x0, self.user_id))
+
+    def update_c1(self, c1: float):
+        self.db.update(Update.ONEDIMOPT_C1, (c1, self.user_id))
+
+    def update_c2(self, c2: float):
+        self.db.update(Update.ONEDIMOPT_C2, (c2, self.user_id))
+
+    def update_max_arg(self, max_arg: float):
+        self.db.update(Update.ONEDIMOPT_MAX_ARG, (max_arg, self.user_id))
 
     def update_acc(self, acc: float):
         """

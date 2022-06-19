@@ -14,7 +14,7 @@ class Brandt:
         Кортеж с двумя значениями типа float, которые задают ограничения для отрезка.
     acc: Optional[float] = 10**-5
         Точность оптимизации. Выражается как разница иксов на n и n-1 итерации. По умолчанию 10**-5
-    max_iteration: Optional[int] = 500
+    max_iter: Optional[int] = 500
         Максимально допустимое количество итераций. По умолчанию 500.
     print_interim: Optional[bool] = False
         Флаг, нужно ли сохранять информацию об итерациях. Информация записывается в строку с ответом.
@@ -26,13 +26,13 @@ class Brandt:
     def __init__(self, func: Callable,
                  interval_x: tuple,
                  acc: Optional[float] = 10**-5,
-                 max_iteration: Optional[int] = 500,
+                 max_iter: Optional[int] = 500,
                  print_interim: Optional[bool] = False,
                  save_iters_df: Optional[bool] = False):
         self.func = func
         self.interval_x = interval_x
         self.acc = acc
-        self.max_iteration = max_iteration
+        self.max_iteration = max_iter
         self.print_interim = print_interim
         self.save_iters_df = save_iters_df
 
@@ -174,7 +174,7 @@ if __name__ == '__main__':
     lims = [(-0.5, 0.5), (6, 9.9), (0, 2*np.pi)]
 
     j = 0
-    x = Brandt(func[j], lims[j], max_iteration=100, acc =10**-5, save_iters_df=True)
+    x = Brandt(func[j], lims[j], acc=10 ** -5, max_iter=100, save_iters_df=True)
     c = x.solve()
     desired_width = 320
 

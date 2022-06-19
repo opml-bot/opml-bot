@@ -16,7 +16,7 @@ class GoldenRatio:
     acc: Optional[float] = 10**-5
         Точность оптимизации. Выражается как разница иксов на n и n-1 итерации.
         По умолчанию 10**-5
-    max_iteration: Optional[int] = 500
+    max_iter: Optional[int] = 500
         Максимально допустимое количество итераций. По умолчанию 500.
     print_interim: Optional[bool] = False
         Флаг, нужно ли сохранять информацию об итерациях. Информация записывается в
@@ -29,13 +29,13 @@ class GoldenRatio:
     def __init__(self, func: Callable[[Real], Real],
                  interval_x: Tuple,
                  acc: Optional[Real] = 10 ** -5,
-                 max_iteration: Optional[Integral] = 500,
+                 max_iter: Optional[Integral] = 500,
                  print_interim: Optional[bool] = False,
                  save_iters_df: Optional[bool] = False):
         self.func = func
         self.interval_x = interval_x
         self.acc = acc
-        self.max_iteration = max_iteration
+        self.max_iteration = max_iter
         self.print_interm = print_interim
         self.save_iters_df = save_iters_df
 
