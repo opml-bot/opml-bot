@@ -147,6 +147,9 @@ def annealing(function, restrictions, type_f='max', start_temp=30, num_iter=1000
 
 
 if __name__ == '__main__':
+
+    from solver_core.stochastic_LP.handlers.utils_annealing import *
+
     objective_function = '8x_1 + 6x_2'
     constraints = ['2x_1 + 5x_2 <= 19', '4x_1 + 1x_2 <= 16']
     x, f = annealing(objective_function, constraints)
