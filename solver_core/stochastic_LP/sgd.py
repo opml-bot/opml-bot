@@ -13,7 +13,7 @@ import math
 import random
 import matplotlib.pyplot as plt
 
-from .utils_sgd import *
+from handlers.utils_sgd import *
 
 def stochatic_gradient_descent(function,restrictions, m = 10, eps = 0.01,max_iter = 1000,eta = 0.01):
   '''

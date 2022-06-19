@@ -5,7 +5,7 @@ import random
 import plotly.express as px
 import pandas as pd
 
-from .utils_annealing import *
+from handlers.utils_annealing import *
 from .drawing_func import *
 
 
