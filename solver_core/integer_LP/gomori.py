@@ -7,11 +7,6 @@ Original file is located at
     https://colab.research.google.com/drive/1qkHSNTthNqjfHXVwCOlrDDOvF9GW0QZA
 """
 
-from fractions import Fraction
-from warnings import warn
-import copy
-import pandas as pd
-
 from solver_core.integer_LP.utils import *
 
 def gomory_solve(num_vars: int, constraints: list, objective_function: tuple):
@@ -58,7 +53,7 @@ def gomory_solve(num_vars: int, constraints: list, objective_function: tuple):
         gomory_history[f'Gomory method step {step}'] = copy.deepcopy(simplex_table)
         basic_vars_history[f'Gomory method step {step}'] = copy.deepcopy(basic_vars)
         step += 1
-    integer_optimum = simplex_table[0][-1]
+    integer_optimum = simplex_table[0][-1]*-1
     integer_optimal_plane = create_solution(simplex_table, basic_vars, num_vars)
 
     return integer_optimum, integer_optimal_plane, gomory_history, basic_vars_history
@@ -72,5 +67,6 @@ if __name__ == '__main__':
         constraints,
         objective_function
     )
+    print(gomory_vals)
     print('Gomory method steps:')
     print_history_table(gomory_history, basic_vars_history, gomory_solution)
