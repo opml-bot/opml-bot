@@ -12,7 +12,7 @@ def restrict_SGD(restrictions: list, func: str):
   ----------
   restrictions: list
       Ограничения
-  function: str
+  func: str
       Функция
 
   Returns
@@ -185,7 +185,7 @@ def stochatic_gradient_descent(function,restrictions, m = 10, eps = 0.01,max_ite
     iter_num+=1
 
 
-  return sample_x[pos], f_x[pos],w_sample
+  return sample_x[pos][1:], f_x[pos],w_sample
 
 if __name__ == '__main__':
 
