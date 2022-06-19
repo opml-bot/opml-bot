@@ -18,10 +18,13 @@ class Pegasos:
     Parameters
     ----------
     X: np.ndarray
-        Массив признаков.
+        Массив признаков обучающей выборки.
     y: np.ndarray
-        Массив правильных меток для признаков.
-        
+        Массив правильных меток для признаков обучающей выборки.
+    Xtest: np.ndarray
+        Массив признаков тестируемой выборки.
+    ytest: np.ndarray
+        Массив правильных меток для тестируемой выборки.  
     reg: Optional[float] = 1
         Параметр регуляризации.
     T: Optional[int] = 500
@@ -32,11 +35,13 @@ class Pegasos:
                  X: np.ndarray,
                  y: np.ndarray,
                  Xtest: np.ndarray,
+                 ytest: np.ndarray,
                  reg: Optional[float] = 1,
                  T: Optional[int] = 500):
         self.X = X
         self.y = y.flatten()
         self.Xtest = Xtest
+        self.ytest = ytest
         self.lam = reg
         self.n_iter = T
         self.w = np.zeros(self.X.shape[1])
@@ -60,7 +65,7 @@ class Pegasos:
         predict = [1 if np.sum(self.w*i) > 0 else -1 for i in self.Xtest]
         acc = np.where(predict != self.y, 0, 1).sum()/self.y.shape[0]
         print(acc)
-        return self.y, predict, self.w
+        return self.ytest, predict, self.w
 
 
 if __name__ == "__main__":
