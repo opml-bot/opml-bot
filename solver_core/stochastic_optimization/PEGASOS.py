@@ -62,9 +62,13 @@ class Pegasos:
                 self.w = (1 - nu*self.lam)*self.w + nu*c*xk
             else:
                 self.w = (1 - nu * self.lam)*self.w
-        predict = [1 if np.sum(self.w*i) > 0 else -1 for i in self.Xtest]
-        acc = np.where(predict != self.y, 0, 1).sum()/self.y.shape[0]
-        print(acc)
+        predict = np.array([1 if np.sum(self.w*i) > 0 else -1 for i in self.Xtest])
+        acc1 = np.where(predict != self.ytest, 0, 1).sum()/self.ytest.shape[0]
+
+        p = np.array([1 if np.sum(self.w*i) > 0 else -1 for i in self.X])
+        acc2 = np.where(p != self.y, 0, 1).sum()/self.y.shape[0]
+
+        print('Accuracy on test:', acc1, '\nAccuracy on train:', acc2)
         return self.ytest, predict, self.w
 
 
@@ -82,5 +86,5 @@ if __name__ == "__main__":
     df.to_csv('data.csv', index=False)
 
     X, y, Xtest, ytest = prepare_data('data.csv')
-    task = Pegasos(X, y,Xtest, T=10**6)
+    task = Pegasos(X, y, Xtest, ytest, T=10**6)
     ans = task.solve()
