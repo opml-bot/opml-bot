@@ -5,8 +5,103 @@ import random
 import plotly.express as px
 import pandas as pd
 
-from handlers.utils_annealing import restrict, calc_temp, transition_prob, do_transition
 
+def restrict(restrictions: list, func: str):
+    """
+    Переписывает ограничения для решения задачи.
+    Parameters
+    ----------
+    restrictions: list
+        Ограничения
+    function: str
+        Функция
+
+    Returns
+    -------
+    A: np.array
+        Массив значений для ограничений
+    B: np.array
+        Массив ограничений
+    C: np.array
+        Массив значений функции
+    sign:
+        Знак
+
+
+    """
+    sign = []
+    C = []
+    for i in func.split('x')[:-1]:
+        C.append(int(i.split()[-1]))
+    C = np.array(C, dtype=np.float)
+
+    A = []
+    B = []
+
+    for i in restrictions:
+        function = str(i)
+
+        if function.find('<=') != -1:
+            sign.append('le')
+            left, right = function.split('<=')
+            B.append(int(right))
+            a1 = []
+            for i in left.split('x')[:-1]:
+                a1.append(int(i.split()[-1]))
+            A.append(a1)
+
+        elif function.find('>=') != -1:
+            sign.append('me')
+            left, right = function.split('>=')
+            B.append(int(right))
+            a1 = []
+            for i in left.split('x')[:-1]:
+                a1.append(int(i.split()[-1]))
+            A.append(a1)
+
+        elif function.find('>') != -1:
+            sign.append('m')
+            left, right = function.split('>')
+            B.append(int(right))
+            a1 = []
+            for i in left.split('x')[:-1]:
+                a1.append(int(i.split()[-1]))
+            A.append(a1)
+
+        elif function.find('<') != -1:
+            sign.append('l')
+            left, right = function.split('<')
+            B.append(int(right))
+            a1 = []
+            for i in left.split('x')[:-1]:
+                a1.append(int(i.split()[-1]))
+            A.append(a1)
+
+        elif function.find('=') != -1:
+            sign.append('e')
+            left, right = function.split('=')
+            B.append(int(right))
+            a1 = []
+            for i in left.split('x')[:-1]:
+                a1.append(int(i.split()[-1]))
+            A.append(a1)
+    A = np.array(A, dtype=np.float)
+    B = np.array(B, dtype=np.float)
+
+    return A, B, C, sign
+
+
+def calc_temp(start_temp: float, num_iter: int, cur_iter: int) -> float:
+    return start_temp * (1 - cur_iter / num_iter)
+
+
+def transition_prob(func_val_diff: float, temp: float):
+    return np.e ** (-func_val_diff / temp)
+
+
+def do_transition(prob: float) -> bool:
+    rand_value = random.random()  # ~Uniform(0, 1)
+    return rand_value <= prob
 
 def annealing(function, restrictions, type_f='max', start_temp=30, num_iter=1000, plot_history=True):
     """
