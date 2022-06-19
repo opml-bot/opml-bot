@@ -61,7 +61,7 @@ def gomory_solve(num_vars: int, constraints: list, objective_function: tuple):
         gomory_history[f'Gomory method step {step}'] = copy.deepcopy(simplex_table)
         basic_vars_history[f'Gomory method step {step}'] = copy.deepcopy(basic_vars)
         step += 1
-    integer_optimum = simplex_table[0][-1]
+    integer_optimum = simplex_table[0][-1]*-1
     integer_optimal_plane = create_solution(simplex_table, basic_vars, num_vars)
 
     return integer_optimum, integer_optimal_plane, gomory_history, basic_vars_history
