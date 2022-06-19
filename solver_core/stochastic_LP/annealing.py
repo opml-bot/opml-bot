@@ -5,6 +5,9 @@ import random
 import plotly.express as px
 import pandas as pd
 
+from solver_core.stochastic_LP.handlers.utils_annealing import restrict, calc_temp, transition_prob, do_transition
+
+
 def annealing(function, restrictions, type_f='max', start_temp=30, num_iter=1000, plot_history=True):
     """
     Решение задачи оптимизации методом имитации отжига
@@ -30,8 +33,6 @@ def annealing(function, restrictions, type_f='max', start_temp=30, num_iter=1000
     E_current: int
         Значение функции в точки оптимума
     """
-
-    from solver_core.stochastic_LP.handlers.utils_annealing import *
 
     coeffs, coef_rest, coef_f, signs = restrict(restrictions, function)
 
