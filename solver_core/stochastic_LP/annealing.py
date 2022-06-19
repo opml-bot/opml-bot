@@ -5,8 +5,6 @@ import random
 import plotly.express as px
 import pandas as pd
 
-from solver_core.search_for_extremes.drawing_func import *
-
 
 def annealing(function, restrictions, type_f='max', start_temp=30, num_iter=1000, plot_history=True):
     """
@@ -143,8 +141,7 @@ def annealing(function, restrictions, type_f='max', start_temp=30, num_iter=1000
         history = history.append({'x': cur_iter, 'y': E_current}, ignore_index=True)
 
     if plot_history:
-        fig = px.line(history, x='x', y='y')
-        save_fig_to_pic(fig, 'graph', ['html'])
+        fig = px.line(history, x='x', y='y').show()
 
     return x_current, E_current
 
