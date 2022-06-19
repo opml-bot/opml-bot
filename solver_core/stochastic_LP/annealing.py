@@ -5,6 +5,8 @@ import random
 import plotly.express as px
 import pandas as pd
 
+from solver_core.stochastic_LP.handlers.utils_annealing import *
+
 
 def annealing(function, restrictions, type_f='max', start_temp=30, num_iter=1000, plot_history=True):
     """
@@ -138,17 +140,11 @@ def annealing(function, restrictions, type_f='max', start_temp=30, num_iter=1000
                     x_current = x_candidate
                     E_current = E_candidate
 
-        history = history.append({'x': cur_iter, 'y': E_current}, ignore_index=True)
-
-    if plot_history:
-        fig = px.line(history, x='x', y='y').show()
 
     return x_current, E_current
 
 
 if __name__ == '__main__':
-
-    from solver_core.stochastic_LP.handlers.utils_annealing import *
 
     objective_function = '8x_1 + 6x_2'
     constraints = ['2x_1 + 5x_2 <= 19', '4x_1 + 1x_2 <= 16']
