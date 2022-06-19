@@ -5,8 +5,7 @@ import random
 import plotly.express as px
 import pandas as pd
 
-from handlers.utils_annealing import *
-from .drawing_func import *
+from solver_core.search_for_extremes.drawing_func import *
 
 
 def annealing(function, restrictions, type_f='max', start_temp=30, num_iter=1000, plot_history=True):
