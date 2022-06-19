@@ -67,6 +67,5 @@ if __name__ == '__main__':
         constraints,
         objective_function
     )
-    print(gomory_vals)
     print('Gomory method steps:')
     print_history_table(gomory_history, basic_vars_history, gomory_solution)
