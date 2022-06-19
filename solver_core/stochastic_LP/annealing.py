@@ -13,7 +13,7 @@ import math
 import random
 import matplotlib.pyplot as plt
 
-from solver_core.annealing_method.utils import *
+from solver_core.stochastic_LP.utils_annealing import *
 
 def annealing(function,restrictions,type_f = 'max', start_temp = 30, num_iter = 1000, plot_history = True):
   '''
