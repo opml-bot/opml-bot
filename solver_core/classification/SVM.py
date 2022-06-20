@@ -1,117 +1,137 @@
-import numpy as np
+
 from typing import Optional
-
-from sklearn.preprocessing import StandardScaler
-from sklearn.svm import SVC
-
-from .draw_classification import draw
-
+from .drawing.draw_func import draw
+import numpy as np
+from sklearn import linear_model
+import statsmodels.api as sm
 
 class SVM:
     """
-    Модель для логистической регрессии. Находит ....
-
+    Обычная модель линейной регрессии.
     Parameters
     ----------
-    X_train: np.ndarray
-        Массив обучающих данных. Может быть одномерными и многомерными.
-
-    y_train: np.ndarray
-        Массив значений обучающих данных. Строго одномерный.
-
-    X_test: np.ndarray
-        Массив данных, на которых тестируется модель. Может быть одномерными и многомерными.
-
-    y_test: np.ndarray
-        Массив данных, верных значений тестовой выборки. Строго одномерный.
-
-    max_iter: Optional[int] = 500
-        Максимальное количество итераций алгоритма.
-
-    type: Optional[str] = 'linear'
-        Тип классификации: линейная или полиномиальная. Принимает значения 'linear' и 'poly'.
-
-    degree: Optional[int] = 1
-        Показатель степени полиномиальной регрессии.
-
-    draw_flag: Optional[bool] = False
-        Флаг рисования результатов работы модели. Принимает значения "True" или "False.
-
+    X : np.ndarray
+        Тренировочные данные.
+    y : np.ndarray
+        Значения целевой функции.
+    regularization : Optional[str] = None
+        Тип регуляризации.
+    alpha : Optional[int] = 10
+        Скорость обучения.
     """
 
     def __init__(self,
-                 X_train: np.ndarray,
-                 y_train: np.ndarray,
-                 X_test: np.ndarray,
-                 y_test: np.ndarray,
-                 max_iter: Optional[int] = -1,
-                 kernel: Optional[str] = 'linear',
-                 degree: Optional[int] = 2,
+                 X: np.ndarray,
+                 y: np.ndarray,
+                 regularization: Optional[str] = None,
+                 alpha: Optional[int] = 10,
                  draw_flag: Optional[bool] = False):
-        self.X_train = X_train
-        self.y_train = y_train
-        self.X_test = X_test
-        self.y_test = y_test
-        self.max_iter = max_iter
-        self.kernel = kernel
-        self.degree = degree
+
+        self.x_points = X
+        self.y_points = y
+        self.regularization = regularization
+        self.alpha = alpha
         self.draw_flag = draw_flag
 
-    def solve(self):
-        """
-        Метод для запуска решения. В нем логичтическая регрессия.
+        # omega - искомые коэфициенты. Здесь задаются начальные значения
+        if len(self.x_points.shape) == 1:
+            self.omega = np.zeros(2)
+        else:
+            self.omega = np.zeros(self.x_points.shape[1] + 1)
+        self.omega[0] = 1        
 
+    def solve(self) -> list:
+        """
+        Метод для запуска решения. 
+        
         Returns
         -------
         func: str
-            Массив предсказанных классов в формате [x_new|t_new], где t - класс.
-
+            Функция в аналитическом виде.
         koefs: np.ndarray
-            Коэфициенты регрессии w.
-
+            Коэфициенты регрессии (при x).
+        free_member: float
+            Свободный член регресси.
         """
-        '''
-        #self.X_train = np.concatenate((np.ones_like(X_train[:,0:1]), X_train), axis=1)
-        max_feature_value = np.amax(self.y_train)
-        features = self.X_train.shape[1]
-        self.omega = np.array([max_feature_value]*features)
-        print(self.omega.shape)
-        learning_rate = [0.1**i*max_feature_value for i in range(3)]
-        b_step_size = 2
-        b_multiple = 5
-        optimized = False
-        for lr in learning_rate:
-            while not optimized:
-                for b in np.arange(-1*(max_feature_value*b_step_size), max_feature_value*b_step_size, lr*b_multiple):
-                    for i in range(self.X_train.shape[0]):
-                        if self.y_train[i]*(self.X_train[i]@self.omega.T+b)<1:
-                            print(self.y_train[i],self.X_train[i], self.omega)
-                            self.omega = np.add(self.omega,lr*(self.X_train[i]@self.y_train[i]*(-2)/features)*self.omega.T,self.omega, casting="unsafe")
-                        else:
-                            self.omega = np.add(self.omega,lr*((-2)/features)*self.omega.T,self.omega, casting="unsafe")
-                            b_opt = b
-                            optimized = True
 
-                            print(self.omega,b_opt)
-        print(self.X_test.shape,self.omega.shape)
-        y_pred = np.sign(self.X_test@self.omega.T + b_opt)'''
-        model = SVC(kernel=self.kernel, degree=self.degree, max_iter=self.max_iter)
-        scaler = StandardScaler()
-        scaler.fit(self.X_train)
-        model.fit(self.X_train, self.y_train.reshape(-1, 1))
-        y_pred = model.predict(self.X_test).T.reshape(-1, 1)
+        if len(self.x_points.shape) == 1:
+            self.X = np.array([np.ones(self.x_points.shape[0]), self.x_points]).T
+        else:
+            self.X = np.ones((self.x_points.shape[0],self.x_points.shape[1]+1))
+            self.X[:,1:] = self.x_points
+
+
+        if self.regularization is None:
+            self.omega = np.dot(np.dot(np.linalg.inv(np.dot(self.X.T, self.X)), self.X.T), self.y_points)
+
+        if self.regularization == 'l1':
+            learning_rate = 0.001
+            l1 = self.alpha
+            self.omega = np.dot(np.dot(np.linalg.inv(np.dot(self.X.T, self.X)), self.X.T), self.y_points)
+            for t in range(500):
+                pred = np.dot(self.omega, self.X.T)
+                delta = pred - self.y_points
+                self.omega = self.omega - learning_rate * (self.X.T.dot(delta) + l1 * np.sign(self.omega))
+
+        if self.regularization == 'l2':
+            l2 = self.alpha * 100
+            self.omega = np.dot(np.linalg.inv(l2 * np.eye(2) + self.X.T.dot(X)), np.dot(self.X.T, self.y_points))
+
+        if self.regularization == 'norm':
+            self.omega = np.dot(np.dot(np.linalg.inv(np.dot(self.X.T, self.X)), self.X.T), self.y_points)
+            e = np.random.normal(size=self.X.shape[0])
+            pred = np.dot(self.omega, self.X.T) + e
+            model = sm.OLS(pred, self.X)
+            results = model.fit()
+            self.omega = results.params
+        self.omega = self.omega.flatten()
+        func = f'y = {self.omega[0]:.3f} + {self.omega[1]:.3f} * x' if self.omega[1] >= 0 else f'y = {self.omega[0]:.3f} - {abs(self.omega[1]):.3f} * x'
+        koefs = self.omega[1:]
+        free_member = self.omega[0]
         if self.draw_flag:
-            draw(self.X_test, self.y_test, y_pred).show()
-        return np.concatenate((self.X_test, y_pred), axis=1)
+            draw(self, 2)
+        return func, koefs, free_member
 
+    def predict(self, x):
+        """
+        Метод получает на вход значение/значения X и на основе полученных коэфициентов регресии предсказывает значение.
+        По сути подставляет в полученную функцию иксы.
+        Parameters
+        ----------
+        x: np.ndarray or float
+            Значения x для предсказания. Может быть числом или np.array размерности 2 или 1.
+        Returns
+        -------
+        prediction: np.ndarray
+            Предсказанное значение.
+        """
+        if len(x.shape) == 1:
+            X = np.array([np.ones(x.shape[0]), x]).T
+        else:
+            X = np.ones((x.shape[0],x.shape[1]+1))
+            X[:,1:] = x
+        prediction = X.dot(self.omega)
+        return prediction.flatten()
 
-if __name__ == "__main__":
-    X = np.random.randint(100, size=(500, 2))
-    # y = np.array([1 if i[0] > 10 and i[1] > 10 else 0 for i in X]).reshape((-1, 1))
-    y = np.array([1 if (i[0] - 50) ** 2 + (i[1] - 50) ** 2 <= 600 else 2 for i in X]).reshape((-1, 1))
-    X_train = X[:int(0.8*500), :]
-    y_train = y[:int(0.8*500), :]
-    X_test = X[int(0.8*500):, :]
-    y_test = y[int(0.8*500):, :]
-    pred = SVM(X_train, y_train, X_test,y_test, max_iter=100, draw_flag=1, kernel='poly', degree=6).solve
-    print(pred, y_test)
+    def r2(self):
+        """
+        Коэфициент детерминации. Используется для измерения точности построенной регресии.
+        Returns
+        -------
+        score: float
+            Значение от -inf до 1. Чем больше, тем точнее построенная регрессия.
+        """
+
+        score = 1 - np.sum((self.y_points - self.predict(self.x_points)) ** 2) / np.sum((self.y_points - self.y_points.mean()) ** 2)
+        return score
+
+if __name__ == '__main__':
+    X = np.sort(np.random.choice(np.linspace(0, 2 * np.pi, num=1000), size=25, replace=True))
+    y = np.sin(X) + 1 + np.random.normal(0, 0.3, size=X.shape[0])
+
+    task = SVM(X=X, y=y)
+    answer = task.solve()
+    print(answer)
+    y_pred = task.predict(X)
+    print(y_pred)
+
